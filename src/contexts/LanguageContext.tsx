@@ -9,9 +9,10 @@ import { vi } from '../i18n/vi';
 import { th } from '../i18n/th';
 import { tl } from '../i18n/tl';
 import { id } from '../i18n/id';
+import { uz } from '../i18n/uz';
 
 const translations: Record<string, Record<string, string>> = {
-  en, ko, ja, zh, vi, th, tl, id,
+  en, ko, ja, zh, vi, th, tl, id, uz,
 };
 
 interface LanguageContextType {

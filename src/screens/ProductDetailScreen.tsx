@@ -249,7 +249,7 @@ export default function ProductDetailScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Image Carousel */}
         <View style={styles.imageCarousel}>

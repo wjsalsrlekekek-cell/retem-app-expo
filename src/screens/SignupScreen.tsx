@@ -37,6 +37,7 @@ const LANGUAGES: LanguageOption[] = [
   { code: 'th', label: 'ไทย' },
   { code: 'tl', label: 'Tagalog' },
   { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'uz', label: "O'zbek" },
 ];
 
 export default function SignupScreen() {

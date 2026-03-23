@@ -22,6 +22,7 @@ const LANGUAGES = [
   { code: 'th', label: 'ภาษาไทย' },
   { code: 'tl', label: 'Filipino' },
   { code: 'id', label: 'Bahasa Indonesia' },
+  { code: 'uz', label: "O'zbek" },
 ];
 
 export default function SettingsScreen() {

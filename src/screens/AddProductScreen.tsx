@@ -102,7 +102,15 @@ export default function AddProductScreen() {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.verifyButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.verifyButton}
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.goBack();
+              // Navigate to Profile tab's Verification screen
+              (navigation as any).navigate('ProfileTab', { screen: 'Verification' });
+            }}
+          >
             <Text style={styles.verifyButtonText}>{t('verify.unverified_action')}</Text>
           </TouchableOpacity>
           <Text style={styles.browseText}>{t('verify.unverified_browse')}</Text>

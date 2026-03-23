@@ -437,15 +437,15 @@ const styles = StyleSheet.create({
   },
   categoryContent: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 6,
+    paddingVertical: 10,
+    gap: 8,
     alignItems: 'center',
   },
   categoryChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
-    marginRight: 6,
+    marginRight: 4,
   },
   categoryChipActive: {
     backgroundColor: '#10b981',
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
   },
   categoryChipText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '500',
   },
   categoryChipTextActive: {

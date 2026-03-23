@@ -298,7 +298,7 @@ export function translateReview(reviewId: string, lang: string): string | null {
 
 /** Language name in each language for the "Translated from" banner */
 export const langLabels: Record<string, Record<string, string>> = {
-    en: { en: 'English', ko: '영어', ja: '英語', zh: '英语', vi: 'tiếng Anh', th: 'อังกฤษ', tl: 'Ingles', id: 'Inggris' },
+    en: { en: 'English', ko: '영어', ja: '英語', zh: '英语', vi: 'tiếng Anh', th: 'อังกฤษ', tl: 'Ingles', id: 'Inggris', uz: 'Ingliz tili' },
 };
 
 // ────────────────────────────────────────────────
@@ -307,13 +307,13 @@ export const langLabels: Record<string, Record<string, string>> = {
 
 const CHAT_LANG_CODES: Record<string, string> = {
     ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN',
-    vi: 'vi', th: 'th', tl: 'tl', id: 'id',
+    vi: 'vi', th: 'th', tl: 'tl', id: 'id', uz: 'uz',
 };
 
 /** Language display names for the translation banner */
 export const LANG_DISPLAY_NAMES: Record<string, string> = {
     ko: '한국어', en: 'English', ja: '日本語', zh: '中文',
-    vi: 'Tiếng Việt', th: 'ไทย', tl: 'Filipino', id: 'Bahasa Indonesia',
+    vi: 'Tiếng Việt', th: 'ไทย', tl: 'Filipino', id: 'Bahasa Indonesia', uz: "O'zbek",
 };
 
 // In-memory cache to avoid re-translating same messages

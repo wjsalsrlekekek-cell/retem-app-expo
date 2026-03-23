@@ -6,8 +6,9 @@ export { vi } from './vi';
 export { th } from './th';
 export { tl } from './tl';
 export { id } from './id';
+export { uz } from './uz';
 
-export const supportedLanguages = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'tl', 'id'];
+export const supportedLanguages = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'tl', 'id', 'uz'];
 
 export const languageNames: Record<string, string> = {
     en: 'English',
@@ -18,6 +19,7 @@ export const languageNames: Record<string, string> = {
     th: 'ไทย',
     tl: 'Filipino',
     id: 'Bahasa Indonesia',
+    uz: "O'zbek",
 };
 
 export const languageFlags: Record<string, string> = {
@@ -29,4 +31,5 @@ export const languageFlags: Record<string, string> = {
     th: '🇹🇭',
     tl: '🇵🇭',
     id: '🇮🇩',
+    uz: '🇺🇿',
 };

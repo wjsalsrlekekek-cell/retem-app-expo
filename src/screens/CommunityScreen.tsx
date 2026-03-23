@@ -29,7 +29,7 @@ import {
   Shield,
 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from '../contexts/ToastContext';
@@ -62,6 +62,7 @@ export default function CommunityScreen() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const { showToast } = useToast();
+  const insets = useSafeAreaInsets();
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -264,6 +265,7 @@ export default function CommunityScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
+        <Text style={{ fontSize: 28, fontWeight: '800', color: '#10b981', marginBottom: 12 }}>Re;Tem</Text>
         <ActivityIndicator size="large" color="#10b981" />
       </View>
     );
@@ -272,7 +274,7 @@ export default function CommunityScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerTitle}>{t('community.title') || 'Community'}</Text>
       </View>
 
@@ -623,7 +625,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 48,
     paddingBottom: 12,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,

@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, Image, Modal,
   TextInput, StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   User, ChevronRight, ShoppingBag, Heart, Star, Shield,
   Settings, HelpCircle, LogOut, Edit2, MapPin, BadgeCheck, X,
@@ -19,6 +20,7 @@ export default function ProfileScreen() {
   const { t } = useLanguage();
   const { showToast } = useToast();
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   const [sellingCount, setSellingCount] = useState(0);
   const [soldCount, setSoldCount] = useState(0);
@@ -117,6 +119,11 @@ export default function ProfileScreen() {
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10b981" />}
     >
+      {/* Screen Header */}
+      <View style={[styles.screenHeader, { paddingTop: insets.top + 8 }]}>
+        <Text style={styles.screenHeaderTitle}>{t('profile.title') || 'My Profile'}</Text>
+      </View>
+
       {/* Profile Header */}
       <View style={styles.card}>
         <View style={styles.profileHeader}>
@@ -237,6 +244,18 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9fafb' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  screenHeader: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  screenHeaderTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
   card: {
     backgroundColor: '#fff', borderRadius: 12, marginHorizontal: 16,
     marginTop: 16, padding: 16,

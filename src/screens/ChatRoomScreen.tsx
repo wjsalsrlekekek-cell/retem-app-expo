@@ -13,6 +13,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
   Send,
@@ -60,6 +61,7 @@ export default function ChatRoomScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<ChatRoomRoute>();
   const { chatId } = route.params;
+  const insets = useSafeAreaInsets();
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -476,7 +478,7 @@ export default function ChatRoomScreen() {
       keyboardVerticalOffset={0}
     >
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
           <ArrowLeft size={22} color="#0f172a" />
         </TouchableOpacity>
@@ -581,7 +583,7 @@ export default function ChatRoomScreen() {
       />
 
       {/* Input Bar */}
-      <View style={styles.inputBar}>
+      <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         <TextInput
           value={text}
           onChangeText={setText}
@@ -685,7 +687,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingTop: 48,
     paddingBottom: 10,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,

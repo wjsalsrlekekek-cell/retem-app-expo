@@ -276,7 +276,7 @@ export default function SignupScreen() {
           ) : (
             <>
               <Image
-                source={{ uri: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg' }}
+                source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
                 style={styles.googleIcon}
               />
               <Text style={styles.secondaryButtonText}>{t('auth.signup.google')}</Text>

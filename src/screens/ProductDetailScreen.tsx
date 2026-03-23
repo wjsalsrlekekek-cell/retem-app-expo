@@ -13,6 +13,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ArrowLeft,
   Share2,
@@ -77,6 +78,7 @@ export default function ProductDetailScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { showToast } = useToast();
+  const insets = useSafeAreaInsets();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [seller, setSeller] = useState<User | null>(null);
@@ -205,6 +207,7 @@ export default function ProductDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
+        <Text style={{ fontSize: 28, fontWeight: '800', color: '#10b981', marginBottom: 12 }}>Re;Tem</Text>
         <ActivityIndicator size="large" color="#10b981" />
       </View>
     );
@@ -226,7 +229,7 @@ export default function ProductDetailScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.headerButton}
@@ -423,7 +426,7 @@ export default function ProductDetailScreen() {
       </ScrollView>
 
       {/* Bottom Actions */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 10) + 10 }]}>
         <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
           <Heart
             size={20}
@@ -554,7 +557,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingTop: 48,
     paddingBottom: 10,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
@@ -760,7 +762,6 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    paddingBottom: 30,
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e2e8f0',

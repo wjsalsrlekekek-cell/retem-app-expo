@@ -167,7 +167,7 @@ export default function LoginScreen() {
           ) : (
             <>
               <Image
-                source={{ uri: 'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg' }}
+                source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
                 style={styles.googleIcon}
               />
               <Text style={styles.secondaryButtonText}>{t('auth.signup.google')}</Text>
@@ -183,12 +183,14 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Demo Accounts */}
-        <View style={styles.demoBox}>
-          <Text style={styles.demoTitle}>Demo Accounts:</Text>
-          <Text style={styles.demoText}>sarah@example.com / Test1234</Text>
-          <Text style={styles.demoText}>james@example.com / Test1234</Text>
-        </View>
+        {/* Demo Accounts (dev only) */}
+        {__DEV__ && (
+          <View style={styles.demoBox}>
+            <Text style={styles.demoTitle}>Demo Accounts:</Text>
+            <Text style={styles.demoText}>sarah@example.com / Test1234</Text>
+            <Text style={styles.demoText}>james@example.com / Test1234</Text>
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );

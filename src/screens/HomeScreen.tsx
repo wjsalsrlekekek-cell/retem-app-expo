@@ -260,6 +260,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
+        <Text style={{ fontSize: 32, fontWeight: '800', color: '#10b981', marginBottom: 16 }}>Re;Tem</Text>
         <ActivityIndicator size="large" color="#10b981" />
       </View>
     );

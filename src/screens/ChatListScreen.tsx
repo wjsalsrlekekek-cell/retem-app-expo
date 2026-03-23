@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -32,6 +33,7 @@ export default function ChatListScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const navigation = useNavigation<NavigationProp>();
+  const insets = useSafeAreaInsets();
   const [chats, setChats] = useState<Chat[]>([]);
   const [usersMap, setUsersMap] = useState<Record<string, User>>({});
   const [productsMap, setProductsMap] = useState<Record<string, Product>>({});
@@ -143,7 +145,7 @@ export default function ChatListScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerTitle}>{t('chat.title')}</Text>
       </View>
 
@@ -183,7 +185,6 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
   },
   header: {
-    paddingTop: 56,
     paddingBottom: 16,
     paddingHorizontal: 16,
     backgroundColor: '#ffffff',

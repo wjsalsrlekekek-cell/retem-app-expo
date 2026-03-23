@@ -12,7 +12,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Search,
   Bell,
@@ -168,6 +170,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useLanguage();
   const navigation = useNavigation<HomeNav>();
+  const insets = useSafeAreaInsets();
 
   const loadProducts = useCallback(async () => {
     const data = await db.fetchProducts();
@@ -265,7 +268,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.headerLogo}>Re;Tem</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
@@ -408,7 +411,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 48,
     paddingBottom: 10,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
@@ -428,15 +430,15 @@ const styles = StyleSheet.create({
   },
   // Categories
   categoryContainer: {
-    maxHeight: 48,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
   },
   categoryContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     gap: 6,
+    alignItems: 'center',
   },
   categoryChip: {
     paddingHorizontal: 12,

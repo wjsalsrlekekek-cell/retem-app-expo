@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home, MessageCircle, PlusCircle, Users, User } from 'lucide-react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Screen imports — these will be created as screen files are added
 import LoginScreen from '../screens/LoginScreen';
@@ -132,16 +133,19 @@ function ProfileStack() {
 // ─── Main Tabs ───────────────────────────────────────────────────────
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
+  const tabBarBottomPadding = Math.max(insets.bottom, 10);
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: 60,
+          height: 60 + tabBarBottomPadding,
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: '#e5e7eb',
-          paddingBottom: 6,
+          paddingBottom: tabBarBottomPadding,
           paddingTop: 6,
         },
         tabBarActiveTintColor: '#10b981',
@@ -240,7 +244,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#10b981',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
     shadowColor: '#10b981',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

@@ -15,6 +15,7 @@ import {
 import {
   ArrowLeft,
   Camera,
+  Image as ImageIcon,
   X,
   Shield,
   ShoppingBag,
@@ -62,6 +63,7 @@ export default function AddProductScreen() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [showImageSourceModal, setShowImageSourceModal] = useState(false);
   const [directDeal, setDirectDeal] = useState(true);
   const [parcelService, setParcelService] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -193,6 +195,33 @@ export default function AddProductScreen() {
     }
   };
 
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        t('product.add.camera_permission_title') || 'Camera Permission',
+        t('product.add.camera_permission_msg') || 'Please allow camera access to take photos.'
+      );
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setIsSubmitting(true);
+      try {
+        const url = await db.uploadImage(result.assets[0].uri);
+        setImages([...images, url]);
+      } catch {
+        showToast('Failed to upload image', 'error');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const handlePublish = async () => {
     if (!user) return;
     if (!title || title.length < 5) {
@@ -308,7 +337,7 @@ export default function AddProductScreen() {
               {images.length < 10 ? (
                 <TouchableOpacity
                   style={styles.addImageButton}
-                  onPress={pickImages}
+                  onPress={() => setShowImageSourceModal(true)}
                   activeOpacity={0.7}
                 >
                   {isSubmitting ? (
@@ -570,6 +599,59 @@ export default function AddProductScreen() {
                 </TouchableOpacity>
               )}
             />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Image Source Modal */}
+      <Modal
+        visible={showImageSourceModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowImageSourceModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.imageSourceOverlay}
+          activeOpacity={1}
+          onPress={() => setShowImageSourceModal(false)}
+        >
+          <View style={styles.imageSourceSheet}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.imageSourceTitle}>
+              {t('product.add.photo_source_title') || 'Add Photo'}
+            </Text>
+            <TouchableOpacity
+              style={styles.imageSourceOption}
+              onPress={() => {
+                setShowImageSourceModal(false);
+                takePhoto();
+              }}
+            >
+              <Camera size={22} color="#10b981" />
+              <Text style={styles.imageSourceOptionText}>
+                {t('product.add.photo_from_camera') || 'Take Photo'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.imageSourceOption}
+              onPress={() => {
+                setShowImageSourceModal(false);
+                pickImages();
+              }}
+            >
+              <ImageIcon size={22} color="#10b981" />
+              <Text style={styles.imageSourceOptionText}>
+                {t('product.add.photo_from_gallery') || 'Choose from Gallery'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.imageSourceCancel}
+              onPress={() => setShowImageSourceModal(false)}
+            >
+              <Text style={styles.imageSourceCancelText}>
+                {t('product.add.cancel') || 'Cancel'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>
@@ -974,6 +1056,53 @@ const styles = StyleSheet.create({
   },
   categoryItemTextSelected: {
     color: '#059669',
+    fontWeight: '600',
+  },
+  // Image source modal
+  imageSourceOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+  },
+  imageSourceSheet: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  imageSourceTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0f172a',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  imageSourceOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    marginBottom: 8,
+  },
+  imageSourceOptionText: {
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: '500',
+  },
+  imageSourceCancel: {
+    marginTop: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderRadius: 12,
+    backgroundColor: '#f1f5f9',
+  },
+  imageSourceCancelText: {
+    fontSize: 15,
+    color: '#64748b',
     fontWeight: '600',
   },
 });

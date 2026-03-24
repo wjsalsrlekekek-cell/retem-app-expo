@@ -134,7 +134,7 @@ export default function SettingsScreen() {
 
         <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('Privacy')}>
           <Shield size={20} color="#4b5563" />
-          <Text style={styles.menuLabel}>{t('settings.privacy_policy') || 'Privacy Policy'}</Text>
+          <Text style={styles.menuLabel}>{t('settings.privacy') || 'Privacy Policy'}</Text>
           <ChevronRight size={18} color="#9ca3af" />
         </TouchableOpacity>
 
@@ -194,10 +194,8 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      {/* Danger Zone */}
+      {/* Logout & Delete */}
       <View style={styles.card}>
-        <Text style={[styles.sectionTitle, { color: '#ef4444' }]}>{t('settings.danger_zone') || 'Danger Zone'}</Text>
-
         <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
           <LogOut size={20} color="#ef4444" />
           <Text style={[styles.menuLabel, { color: '#ef4444' }]}>{t('profile.logout') || 'Logout'}</Text>

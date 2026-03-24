@@ -159,7 +159,9 @@ export default function ChatListScreen() {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <MessageCircle size={44} color="#94a3b8" style={{ opacity: 0.4 }} />
+          <View style={styles.emptyIconWrap}>
+            <MessageCircle size={32} color="#94a3b8" />
+          </View>
           <Text style={styles.emptyTitle}>{t('chat.empty')}</Text>
           <Text style={styles.emptyDesc}>{t('chat.empty_desc')}</Text>
         </View>
@@ -279,17 +281,28 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 100,
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+  },
+  emptyIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   emptyTitle: {
-    fontWeight: '600',
-    fontSize: 14,
-    color: '#94a3b8',
-    marginTop: 10,
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#334155',
+    marginBottom: 6,
   },
   emptyDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#94a3b8',
-    marginTop: 4,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

@@ -11,8 +11,6 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
-  Dimensions,
-  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -34,17 +32,17 @@ import type { HomeStackParamList } from '../navigation/AppNavigator';
 
 type HomeNav = NativeStackNavigationProp<HomeStackParamList, 'HomeScreen'>;
 
-const categories = [
-  'All',
-  'Electronics',
-  'Fashion',
-  'Home & Living',
-  'Sports & Outdoors',
-  'Books & Media',
-  'Furniture',
-  'Toys & Games',
-  'Beauty & Health',
-  'Others',
+const categoryItems = [
+  { value: 'All', key: 'home.all' },
+  { value: 'Electronics', key: 'category.electronics' },
+  { value: 'Fashion', key: 'category.fashion' },
+  { value: 'Home & Living', key: 'category.home_living' },
+  { value: 'Sports & Outdoors', key: 'category.sports' },
+  { value: 'Books & Media', key: 'category.books' },
+  { value: 'Furniture', key: 'category.furniture' },
+  { value: 'Toys & Games', key: 'category.toys' },
+  { value: 'Beauty & Health', key: 'category.beauty' },
+  { value: 'Others', key: 'category.others' },
 ];
 
 const conditionColors: Record<string, string> = {
@@ -79,16 +77,13 @@ function formatPrice(price: number): string {
 
 interface ProductCardProps {
   product: Product;
+  seller?: User | null;
   onPress: () => void;
 }
 
-const ProductCard = React.memo(function ProductCard({ product, onPress }: ProductCardProps) {
-  const [seller, setSeller] = useState<User | null>(null);
-
-  useEffect(() => {
-    db.fetchUser(product.sellerId).then(setSeller);
-  }, [product.sellerId]);
-
+const ProductCard = React.memo(function ProductCard({ product, seller, onPress }: ProductCardProps) {
+  const condColor = conditionColors[product.condition] || '#64748b';
+  const condBg = conditionBg[product.condition] || '#f1f5f9';
   return (
     <TouchableOpacity
       style={styles.productCard}
@@ -96,64 +91,38 @@ const ProductCard = React.memo(function ProductCard({ product, onPress }: Produc
       activeOpacity={0.7}
     >
       <Image
-        source={{ uri: product.images[0] || 'https://via.placeholder.com/100' }}
+        source={{ uri: product.images[0] || 'https://via.placeholder.com/200' }}
         style={styles.productImage}
       />
       <View style={styles.productInfo}>
-        <View>
-          <Text style={styles.productTitle} numberOfLines={1}>
-            {product.title}
-          </Text>
-          <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
-        </View>
-
-        <View>
-          {seller ? (
-            <View style={styles.sellerRow}>
-              <Image
-                source={{ uri: seller.profileImage }}
-                style={styles.sellerAvatar}
-              />
-              <Text style={styles.sellerName}>{seller.fullName}</Text>
-              {seller.verified ? (
-                <BadgeCheck size={11} color="#10b981" />
-              ) : null}
-            </View>
-          ) : null}
-
-          <View style={styles.metaRow}>
-            <View style={styles.metaItem}>
-              <MapPin size={10} color="#94a3b8" />
-              <Text style={styles.metaText}>{product.location}</Text>
-            </View>
-            <View
-              style={[
-                styles.conditionBadge,
-                { backgroundColor: conditionBg[product.condition] ?? '#f1f5f9' },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.conditionText,
-                  { color: conditionColors[product.condition] ?? '#64748b' },
-                ]}
-              >
-                {product.condition}
-              </Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Eye size={10} color="#cbd5e1" />
-              <Text style={styles.metaTextLight}>{product.views}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Heart size={10} color="#cbd5e1" />
-              <Text style={styles.metaTextLight}>{product.likes}</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Clock size={10} color="#cbd5e1" />
-              <Text style={styles.metaTextLight}>{timeAgo(product.createdAt)}</Text>
-            </View>
+        <Text style={styles.productTitle} numberOfLines={1}>
+          {product.title}
+        </Text>
+        <Text style={styles.productPrice}>{formatPrice(product.price)}</Text>
+        {seller && (
+          <View style={styles.sellerRow}>
+            <Text style={styles.sellerName}>{seller.fullName}</Text>
+            {seller.verified && <BadgeCheck size={14} color="#10b981" />}
           </View>
+        )}
+        <View style={styles.metaRow}>
+          <MapPin size={11} color="#94a3b8" />
+          <Text style={styles.metaText} numberOfLines={1}>{product.location}</Text>
+          <View style={[styles.conditionBadge, { backgroundColor: condBg }]}>
+            <Text style={[styles.conditionText, { color: condColor }]}>{product.condition}</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Eye size={11} color="#94a3b8" />
+            <Text style={styles.metaTextLight}>{product.views}</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Heart size={11} color="#94a3b8" />
+            <Text style={styles.metaTextLight}>{product.likes}</Text>
+          </View>
+        </View>
+        <View style={styles.timeRow}>
+          <Clock size={11} color="#cbd5e1" />
+          <Text style={styles.timeText}>{timeAgo(product.createdAt)}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -166,6 +135,7 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [sellersMap, setSellersMap] = useState<Record<string, User>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { t } = useLanguage();
@@ -175,6 +145,16 @@ export default function HomeScreen() {
   const loadProducts = useCallback(async () => {
     const data = await db.fetchProducts();
     setProducts(data);
+
+    const sellerIds = new Set(data.map((p) => p.sellerId));
+    const sellers: Record<string, User> = {};
+    await Promise.all(
+      Array.from(sellerIds).map(async (sid) => {
+        const u = await db.fetchUser(sid);
+        if (u) sellers[sid] = u;
+      }),
+    );
+    setSellersMap(sellers);
     setLoading(false);
   }, []);
 
@@ -236,12 +216,13 @@ export default function HomeScreen() {
     ({ item }: { item: Product }) => (
       <ProductCard
         product={item}
+        seller={sellersMap[item.sellerId]}
         onPress={() =>
           navigation.navigate('ProductDetail', { productId: item.id })
         }
       />
     ),
-    [navigation],
+    [navigation, sellersMap],
   );
 
   const keyExtractor = useCallback((item: Product) => item.id, []);
@@ -249,7 +230,9 @@ export default function HomeScreen() {
   const renderListEmpty = useCallback(
     () => (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyIcon}>&#128269;</Text>
+        <View style={styles.emptyIconWrap}>
+          <Search size={32} color="#94a3b8" />
+        </View>
         <Text style={styles.emptyTitle}>{t('empty.no_products')}</Text>
         <Text style={styles.emptyDesc}>{t('empty.no_products_desc')}</Text>
       </View>
@@ -285,19 +268,19 @@ export default function HomeScreen() {
       </View>
 
       {/* Category Tabs */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoryContainer}
-        contentContainerStyle={styles.categoryContent}
-      >
-        {categories.map((cat) => (
+      <View style={styles.categoryContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryContent}
+        >
+        {categoryItems.map((cat) => (
           <TouchableOpacity
-            key={cat}
-            onPress={() => setSelectedCategory(cat)}
+            key={cat.value}
+            onPress={() => setSelectedCategory(cat.value)}
             style={[
               styles.categoryChip,
-              selectedCategory === cat
+              selectedCategory === cat.value
                 ? styles.categoryChipActive
                 : styles.categoryChipInactive,
             ]}
@@ -306,16 +289,17 @@ export default function HomeScreen() {
             <Text
               style={[
                 styles.categoryChipText,
-                selectedCategory === cat
+                selectedCategory === cat.value
                   ? styles.categoryChipTextActive
                   : styles.categoryChipTextInactive,
               ]}
             >
-              {cat === 'All' ? t('home.all') : cat}
+              {t(cat.key) || cat.value}
             </Text>
           </TouchableOpacity>
         ))}
-      </ScrollView>
+        </ScrollView>
+      </View>
 
       {/* Sort Options */}
       <View style={styles.sortContainer}>
@@ -434,18 +418,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
+    overflow: 'visible',
   },
   categoryContent: {
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 8,
+    paddingVertical: 8,
+    gap: 6,
     alignItems: 'center',
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
   },
   categoryChipActive: {
     backgroundColor: '#10b981',
@@ -502,11 +486,10 @@ const styles = StyleSheet.create({
   // Product card
   productCard: {
     flexDirection: 'row',
-    gap: 12,
     marginBottom: 10,
-    padding: 10,
     borderRadius: 14,
     backgroundColor: '#ffffff',
+    padding: 12,
     borderWidth: 1,
     borderColor: '#f1f5f9',
     shadowColor: '#000',
@@ -516,40 +499,37 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   productImage: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     borderRadius: 12,
     backgroundColor: '#f1f5f9',
   },
   productInfo: {
     flex: 1,
-    justifyContent: 'space-between',
-    overflow: 'hidden',
+    marginLeft: 12,
+    justifyContent: 'center',
   },
   productTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: '#0f172a',
+    marginBottom: 2,
   },
   productPrice: {
     fontSize: 17,
     fontWeight: '700',
     color: '#10b981',
-    marginTop: 2,
+    marginBottom: 4,
   },
   sellerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    marginBottom: 3,
-  },
-  sellerAvatar: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    gap: 4,
+    marginBottom: 6,
   },
   sellerName: {
-    fontSize: 11,
+    fontSize: 12,
+    fontWeight: '500',
     color: '#64748b',
   },
   metaRow: {
@@ -557,6 +537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     flexWrap: 'wrap',
+    marginBottom: 4,
   },
   metaItem: {
     flexDirection: 'row',
@@ -564,39 +545,57 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   metaText: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#94a3b8',
   },
   metaTextLight: {
-    fontSize: 10,
-    color: '#cbd5e1',
+    fontSize: 11,
+    color: '#94a3b8',
   },
   conditionBadge: {
     paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
   },
   conditionText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '600',
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  timeText: {
+    fontSize: 11,
+    color: '#cbd5e1',
   },
   // Empty
   emptyContainer: {
     alignItems: 'center',
     paddingVertical: 60,
+    paddingHorizontal: 20,
   },
-  emptyIcon: {
-    fontSize: 40,
-    marginBottom: 8,
+  emptyIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   emptyTitle: {
-    fontWeight: '600',
-    fontSize: 15,
-    color: '#94a3b8',
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#334155',
+    marginBottom: 6,
   },
   emptyDesc: {
     fontSize: 13,
     color: '#94a3b8',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   // Search modal
   searchOverlay: {

@@ -379,7 +379,9 @@ export default function CommunityScreen() {
         {/* Posts */}
         {posts.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <MessageCircle size={48} color="#cbd5e1" />
+            <View style={styles.emptyIconWrap}>
+              <MessageCircle size={32} color="#94a3b8" />
+            </View>
             <Text style={styles.emptyTitle}>{t('community.empty') || 'No posts yet'}</Text>
             <Text style={styles.emptyDesc}>
               {t('community.empty_desc') || 'Be the first to share with the community'}
@@ -769,18 +771,29 @@ const styles = StyleSheet.create({
   // Posts
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 80,
-    gap: 8,
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+  },
+  emptyIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#94a3b8',
-    marginTop: 8,
+    fontWeight: '700',
+    color: '#334155',
+    marginBottom: 6,
   },
   emptyDesc: {
     fontSize: 13,
-    color: '#cbd5e1',
+    color: '#94a3b8',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   postCard: {
     backgroundColor: '#ffffff',

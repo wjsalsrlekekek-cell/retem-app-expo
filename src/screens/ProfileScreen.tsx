@@ -126,27 +126,29 @@ export default function ProfileScreen() {
 
       {/* Profile Header */}
       <View style={styles.card}>
-        <View style={styles.profileHeader}>
-          <Image
-            source={{ uri: user.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.fullName}` }}
-            style={styles.avatar}
-          />
-          <View style={styles.profileInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.fullName}>{user.fullName}</Text>
-              {user.verified && <BadgeCheck size={18} color="#10b981" />}
-            </View>
-            <Text style={styles.email}>{user.email}</Text>
-            {user.location ? (
-              <View style={styles.locationRow}>
-                <MapPin size={14} color="#9ca3af" />
-                <Text style={styles.locationText}>{user.location}</Text>
+        <View style={styles.profileHeaderBg}>
+          <View style={styles.profileHeader}>
+            <Image
+              source={{ uri: user.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.fullName}` }}
+              style={styles.avatar}
+            />
+            <View style={styles.profileInfo}>
+              <View style={styles.nameRow}>
+                <Text style={styles.fullName}>{user.fullName}</Text>
+                {user.verified && <BadgeCheck size={18} color="#10b981" />}
               </View>
-            ) : null}
+              <Text style={styles.email}>{user.email}</Text>
+              {user.location ? (
+                <View style={styles.locationRow}>
+                  <MapPin size={14} color="#9ca3af" />
+                  <Text style={styles.locationText}>{user.location}</Text>
+                </View>
+              ) : null}
+            </View>
+            <TouchableOpacity onPress={openEditModal} style={styles.editBtn}>
+              <Edit2 size={18} color="#6b7280" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={openEditModal} style={styles.editBtn}>
-            <Edit2 size={18} color="#6b7280" />
-          </TouchableOpacity>
         </View>
 
         {/* Trust Badge */}
@@ -262,8 +264,14 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05, shadowRadius: 4, elevation: 2,
   },
+  profileHeaderBg: {
+    backgroundColor: '#ecfdf5',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 2,
+  },
   profileHeader: { flexDirection: 'row', alignItems: 'center' },
-  avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#e5e7eb' },
+  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#e5e7eb', borderWidth: 3, borderColor: '#10b981' },
   profileInfo: { flex: 1, marginLeft: 14 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   fullName: { fontSize: 18, fontWeight: '700', color: '#111827' },

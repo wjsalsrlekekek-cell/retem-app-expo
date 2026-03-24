@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home, MessageCircle, PlusCircle, Users, User } from 'lucide-react-native';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Screen imports — these will be created as screen files are added
@@ -134,6 +135,7 @@ function ProfileStack() {
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  const { t } = useLanguage();
   const tabBarBottomPadding = Math.max(insets.bottom, 10);
 
   return (
@@ -160,7 +162,7 @@ function MainTabs() {
         name="HomeTab"
         component={HomeStack}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: t('nav.home'),
           tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
         }}
       />
@@ -168,7 +170,7 @@ function MainTabs() {
         name="ChatTab"
         component={ChatStack}
         options={{
-          tabBarLabel: 'Chat',
+          tabBarLabel: t('nav.chat'),
           tabBarIcon: ({ color, size }) => <MessageCircle size={size} color={color} />,
         }}
       />
@@ -196,7 +198,7 @@ function MainTabs() {
         name="CommunityTab"
         component={CommunityScreen}
         options={{
-          tabBarLabel: 'Community',
+          tabBarLabel: t('nav.community'),
           tabBarIcon: ({ color, size }) => <Users size={size} color={color} />,
         }}
       />
@@ -204,7 +206,7 @@ function MainTabs() {
         name="ProfileTab"
         component={ProfileStack}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: t('nav.profile'),
           tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
         }}
       />

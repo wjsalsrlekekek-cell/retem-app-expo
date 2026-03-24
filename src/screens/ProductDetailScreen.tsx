@@ -271,15 +271,22 @@ export default function ProductDetailScreen() {
           </ScrollView>
           {product.images.length > 1 ? (
             <View style={styles.dotsContainer}>
-              {product.images.map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.dot,
-                    currentImageIndex === i ? styles.dotActive : styles.dotInactive,
-                  ]}
-                />
-              ))}
+              <View style={styles.imageCounter}>
+                <Text style={styles.imageCounterText}>
+                  {currentImageIndex + 1} / {product.images.length}
+                </Text>
+              </View>
+              <View style={styles.dotsRow}>
+                {product.images.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.dot,
+                      currentImageIndex === i ? styles.dotActive : styles.dotInactive,
+                    ]}
+                  />
+                ))}
+              </View>
             </View>
           ) : null}
         </View>
@@ -586,14 +593,29 @@ const styles = StyleSheet.create({
   dotsContainer: {
     position: 'absolute',
     bottom: 12,
-    flexDirection: 'row',
     alignSelf: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  imageCounter: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  imageCounterText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  dotsRow: {
+    flexDirection: 'row',
     gap: 6,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   dotActive: {
     backgroundColor: '#10b981',

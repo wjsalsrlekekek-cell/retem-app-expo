@@ -86,6 +86,18 @@ export const en = {
     'home.sort.price_low': 'Price: Low',
     'home.sort.price_high': 'Price: High',
     'home.sort.popular': 'Popular',
+    'home.search_placeholder': 'Search products...',
+
+    // Categories
+    'category.electronics': 'Electronics',
+    'category.fashion': 'Fashion',
+    'category.home_living': 'Home & Living',
+    'category.sports': 'Sports & Outdoors',
+    'category.books': 'Books & Media',
+    'category.furniture': 'Furniture',
+    'category.toys': 'Toys & Games',
+    'category.beauty': 'Beauty & Health',
+    'category.others': 'Others',
 
     // Product
     'product.add.title': 'Sell Product',
@@ -360,6 +372,10 @@ export const en = {
     'settings.notif_chat': 'Chat Messages',
     'settings.notif_like': 'Likes',
     'settings.notif_comment': 'Comments',
+    'settings.notif_messages': 'Messages',
+    'settings.notif_offers': 'Offers',
+    'settings.notif_reviews': 'Reviews',
+    'settings.notif_system': 'System',
     'settings.about': 'About',
     'settings.terms': 'Terms of Service',
     'settings.privacy': 'Privacy Policy',

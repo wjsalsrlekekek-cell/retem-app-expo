@@ -344,7 +344,6 @@ export default function VerificationScreen() {
         ];
 
         const activeIdx = VISIBLE_STEPS.indexOf(step as Step);
-        const connectorWidth = (SCREEN_WIDTH - 40 - 144) / 3; // total minus padding and icon areas
 
         return (
             <View style={styles.stepBarContainer}>
@@ -369,7 +368,7 @@ export default function VerificationScreen() {
                         return (
                             <React.Fragment key={s.key}>
                                 {i > 0 && (
-                                    <View style={[styles.connector, { width: connectorWidth }]}>
+                                    <View style={styles.connector}>
                                         <View style={styles.connectorBg} />
                                         {activeIdx > i - 1 && (
                                             <View style={[styles.connectorFill, {
@@ -385,9 +384,9 @@ export default function VerificationScreen() {
                                         isActive && styles.stepCircleActive,
                                     ]}>
                                         {isCompleted ? (
-                                            <CheckCircle size={20} color="white" />
+                                            <CheckCircle size={16} color="white" />
                                         ) : (
-                                            <IconComponent size={18} color={isActive ? '#10b981' : '#94a3b8'} />
+                                            <IconComponent size={15} color={isActive ? '#10b981' : '#94a3b8'} />
                                         )}
                                     </View>
                                     <Text style={[
@@ -1220,40 +1219,42 @@ const styles = StyleSheet.create({
 
     // Step Bar
     stepBarContainer: {
-        paddingHorizontal: 20,
-        paddingTop: 16,
+        paddingHorizontal: 16,
+        paddingTop: 14,
         paddingBottom: 8,
         backgroundColor: 'white',
         marginBottom: 4,
     },
     stepCounterContainer: {
         alignItems: 'center',
-        marginBottom: 14,
+        marginBottom: 12,
     },
     stepCounterBadge: {
         backgroundColor: '#ecfdf5',
-        paddingHorizontal: 12,
-        paddingVertical: 4,
+        paddingHorizontal: 14,
+        paddingVertical: 5,
         borderRadius: 20,
     },
     stepCounterText: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 13,
+        fontWeight: '700',
         color: '#10b981',
     },
     stepRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 8,
     },
     stepItem: {
         alignItems: 'center',
-        gap: 6,
+        gap: 5,
+        width: 52,
     },
     stepCircle: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#f1f5f9',
@@ -1269,8 +1270,8 @@ const styles = StyleSheet.create({
         borderColor: '#10b981',
     },
     stepLabel: {
-        fontSize: 10,
-        fontWeight: '400',
+        fontSize: 11,
+        fontWeight: '500',
         color: '#94a3b8',
     },
     stepLabelActive: {
@@ -1278,8 +1279,10 @@ const styles = StyleSheet.create({
         color: '#10b981',
     },
     connector: {
-        height: 3,
-        marginTop: 17,
+        flex: 1,
+        height: 2,
+        marginTop: 15,
+        marginHorizontal: -4,
         position: 'relative',
     },
     connectorBg: {
@@ -1287,17 +1290,17 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        height: 3,
+        height: 2,
         backgroundColor: '#e2e8f0',
-        borderRadius: 2,
+        borderRadius: 1,
     },
     connectorFill: {
         position: 'absolute',
         left: 0,
         top: 0,
-        height: 3,
+        height: 2,
         backgroundColor: '#10b981',
-        borderRadius: 2,
+        borderRadius: 1,
     },
 
     // Card

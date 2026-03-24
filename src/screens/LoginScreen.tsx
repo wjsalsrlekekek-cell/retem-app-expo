@@ -183,14 +183,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Demo Accounts (dev only) */}
-        {__DEV__ && (
-          <View style={styles.demoBox}>
-            <Text style={styles.demoTitle}>Demo Accounts:</Text>
-            <Text style={styles.demoText}>sarah@example.com / Test1234</Text>
-            <Text style={styles.demoText}>james@example.com / Test1234</Text>
-          </View>
-        )}
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -331,24 +324,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#10b981',
     fontWeight: '600',
-  },
-  demoBox: {
-    marginTop: 24,
-    padding: 16,
-    backgroundColor: '#f0fdf4',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#d1fae5',
-  },
-  demoTitle: {
-    fontSize: 13,
-    color: '#065f46',
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  demoText: {
-    fontSize: 12,
-    color: '#047857',
-    marginBottom: 2,
   },
 });

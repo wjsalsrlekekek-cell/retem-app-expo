@@ -175,13 +175,13 @@ export async function markNotificationRead(id: string): Promise<void> {
 }
 
 // --- Storage ---
-export async function uploadImage(_uri: string): Promise<string> {
-    // Mock upload delay - in Expo we receive a URI string instead of File
+export async function uploadImage(uri: string): Promise<string> {
+    // In a real app, upload to cloud storage and return the remote URL.
+    // For now, return the local file URI directly so the actual photo is displayed.
     return new Promise((resolve) => {
         setTimeout(() => {
-            const seed = Math.random().toString(36).substring(7);
-            resolve(`https://picsum.photos/seed/${seed}/400/400`);
-        }, 800);
+            resolve(uri);
+        }, 300);
     });
 }
 

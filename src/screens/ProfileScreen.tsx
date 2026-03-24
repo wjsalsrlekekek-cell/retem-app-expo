@@ -6,13 +6,15 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   User, ChevronRight, ShoppingBag, Heart, Star, Shield,
-  Settings, HelpCircle, LogOut, Edit2, MapPin, BadgeCheck, X,
+  Settings, HelpCircle, LogOut, Edit2, MapPin, BadgeCheck, X, Camera,
 } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from '../contexts/ToastContext';
 import { getProducts, getUserFavorites, getReviewsByUserId, updateUser } from '../lib/storage';
+import * as db from '../lib/db';
 import type { Product, Review } from '../types';
 
 export default function ProfileScreen() {
@@ -30,6 +32,8 @@ export default function ProfileScreen() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editName, setEditName] = useState('');
   const [editLocation, setEditLocation] = useState('');
+  const [editProfileImage, setEditProfileImage] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!user) return;
@@ -66,7 +70,28 @@ export default function ProfileScreen() {
     if (!user) return;
     setEditName(user.fullName);
     setEditLocation(user.location || '');
+    setEditProfileImage(user.profileImage || '');
     setEditModalVisible(true);
+  };
+
+  const pickProfileImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setUploadingImage(true);
+      try {
+        const url = await db.uploadImage(result.assets[0].uri);
+        setEditProfileImage(url);
+      } catch {
+        showToast(t('error.upload_failed') || 'Failed to upload image', 'error');
+      } finally {
+        setUploadingImage(false);
+      }
+    }
   };
 
   const saveProfile = async () => {
@@ -78,6 +103,7 @@ export default function ProfileScreen() {
     await updateUser(user.id, {
       fullName: editName.trim(),
       location: editLocation.trim(),
+      profileImage: editProfileImage || user.profileImage,
       updatedAt: new Date().toISOString(),
     });
     await refreshUser();
@@ -217,6 +243,28 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
+            {/* Profile Photo */}
+            <View style={styles.photoSection}>
+              <View style={styles.photoWrapper}>
+                <Image
+                  source={{ uri: editProfileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.fullName}` }}
+                  style={styles.editAvatar}
+                />
+                <TouchableOpacity
+                  style={styles.cameraBtn}
+                  onPress={pickProfileImage}
+                  disabled={uploadingImage}
+                >
+                  {uploadingImage ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Camera size={16} color="#fff" />
+                  )}
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.photoHint}>{t('profile.change_photo') || 'Tap to change photo'}</Text>
+            </View>
+
             <Text style={styles.inputLabel}>{t('profile.full_name') || 'Full Name'}</Text>
             <TextInput
               style={styles.input}
@@ -323,4 +371,17 @@ const styles = StyleSheet.create({
     alignItems: 'center', marginTop: 24,
   },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  photoSection: { alignItems: 'center', marginBottom: 8 },
+  photoWrapper: { position: 'relative' },
+  editAvatar: {
+    width: 90, height: 90, borderRadius: 45,
+    backgroundColor: '#e5e7eb', borderWidth: 3, borderColor: '#10b981',
+  },
+  cameraBtn: {
+    position: 'absolute', bottom: 0, right: 0,
+    backgroundColor: '#10b981', borderRadius: 16,
+    width: 32, height: 32, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#fff',
+  },
+  photoHint: { fontSize: 12, color: '#9ca3af', marginTop: 6 },
 });

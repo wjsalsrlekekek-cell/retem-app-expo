@@ -108,6 +108,10 @@ export const uz = {
     'product.add.condition': 'Holati',
     'product.add.description': 'Taʻrifi',
     'product.add.location': 'Joylashuvi',
+    'product.add.location_permission_title': 'Joylashuv ruxsati',
+    'product.add.location_permission_msg': 'Joylashuvingizni avtomatik aniqlash uchun joylashuvga kirishga ruxsat bering.',
+    'product.add.location_error_title': 'Joylashuv xatosi',
+    'product.add.location_error_msg': "Joylashuvni aniqlab bo'lmadi. Iltimos, qo'lda kiriting.",
     'product.add.deal_type': 'Kelishuv turi',
     'product.add.direct': "Qo'lma-qo'l",
     'product.add.parcel': 'Pochta',
@@ -235,6 +239,7 @@ export const uz = {
     'profile.edit_photo_change': 'Rasmni oʻzgartirish',
     'profile.edit_photo_remove': 'Rasmni oʻchirish',
     'profile.saved': 'Saqlandi!',
+    'profile.change_photo': 'Rasmni o\'zgartirish uchun bosing',
 
     // Trust Score
     'trust.title': 'Ishonch balli',

@@ -110,6 +110,10 @@ export const en = {
     'product.add.condition': 'Condition',
     'product.add.description': 'Description',
     'product.add.location': 'Location',
+    'product.add.location_permission_title': 'Location Permission',
+    'product.add.location_permission_msg': 'Please allow location access to auto-detect your location.',
+    'product.add.location_error_title': 'Location Error',
+    'product.add.location_error_msg': 'Failed to detect location. Please enter manually.',
     'product.add.deal_type': 'Deal Type',
     'product.add.direct': 'Direct Deal',
     'product.add.parcel': 'Parcel Service',
@@ -237,6 +241,7 @@ export const en = {
     'profile.edit_photo_change': 'Change Photo',
     'profile.edit_photo_remove': 'Remove Photo',
     'profile.saved': 'Profile updated!',
+    'profile.change_photo': 'Tap to change photo',
 
     // Trust Score
     'trust.title': 'Trust Score',

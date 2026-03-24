@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,8 +22,11 @@ import {
   Star,
   BadgeCheck,
   Check,
+  MapPin,
+  Navigation,
 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../contexts/AuthContext';
@@ -58,6 +61,7 @@ export default function AddProductScreen() {
   const [condition, setCondition] = useState<Condition>('Good');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [directDeal, setDirectDeal] = useState(true);
   const [parcelService, setParcelService] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -66,6 +70,45 @@ export default function AddProductScreen() {
   const { t } = useLanguage();
   const { showToast } = useToast();
   const navigation = useNavigation<AddProductNav>();
+
+  const fetchCurrentLocation = async () => {
+    setIsLoadingLocation(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          t('product.add.location_permission_title') || 'Location Permission',
+          t('product.add.location_permission_msg') || 'Please allow location access to auto-detect your location.'
+        );
+        return;
+      }
+
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      const [geocode] = await Location.reverseGeocodeAsync({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      });
+
+      if (geocode) {
+        const parts = [geocode.district || geocode.subregion, geocode.city || geocode.region].filter(Boolean);
+        setLocation(parts.join(', ') || `${geocode.city || geocode.region || 'Unknown'}`);
+      }
+    } catch {
+      Alert.alert(
+        t('product.add.location_error_title') || 'Location Error',
+        t('product.add.location_error_msg') || 'Failed to detect location. Please enter manually.'
+      );
+    } finally {
+      setIsLoadingLocation(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentLocation();
+  }, []);
 
   // Block unverified users
   if (user && !user.verified) {
@@ -374,13 +417,27 @@ export default function AddProductScreen() {
             {/* Location */}
             <View style={styles.fieldGroup}>
               <Text style={styles.fieldLabel}>{t('product.add.location')}</Text>
-              <TextInput
-                style={styles.textInput}
-                value={location}
-                onChangeText={setLocation}
-                placeholder="e.g., Gangnam, Seoul"
-                placeholderTextColor="#94a3b8"
-              />
+              <View style={styles.locationInputRow}>
+                <MapPin size={18} color="#64748b" style={styles.locationIcon} />
+                <TextInput
+                  style={styles.locationTextInput}
+                  value={location}
+                  onChangeText={setLocation}
+                  placeholder="e.g., Gangnam, Seoul"
+                  placeholderTextColor="#94a3b8"
+                />
+                <TouchableOpacity
+                  style={styles.gpsButton}
+                  onPress={fetchCurrentLocation}
+                  disabled={isLoadingLocation}
+                >
+                  {isLoadingLocation ? (
+                    <ActivityIndicator size="small" color="#10b981" />
+                  ) : (
+                    <Navigation size={18} color="#10b981" />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         ) : null}
@@ -665,6 +722,28 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
+  },
+  locationInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+  },
+  locationIcon: {
+    marginRight: 8,
+  },
+  locationTextInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#0f172a',
+  },
+  gpsButton: {
+    padding: 8,
+    marginLeft: 4,
   },
   pickerButton: {
     backgroundColor: '#ffffff',

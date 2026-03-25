@@ -281,6 +281,11 @@ export const uz = {
     'notifications.title': 'Bildirishnomalar',
     'notifications.empty': 'Bildirishnomalar yoʻq',
     'notifications.empty_desc': "Hammasi oʻqilgan!",
+    'notifications.like_title': 'Yangi yoqtirish',
+    'notifications.liked_your': 'sizning mahsulotingizni yoqtirdi',
+    'notifications.product_listed_title': 'Mahsulot joylandi',
+    'notifications.product_listed_body': 'muvaffaqiyatli joylandi!',
+    'notifications.mark_all_read': 'Hammasini oʻqilgan deb belgilash',
 
     // Reviews tab
     'reviews.title': 'Sharhlar',
@@ -349,6 +354,21 @@ export const uz = {
     'mylistings.marked_sold': 'Sotildi deb belgilandi!',
     'mylistings.deleted': 'Eʻlon oʻchirildi',
     'mylistings.reactivated': 'Qayta tiklandi!',
+    'myListings.title': 'Mening mahsulotlarim',
+    'myListings.active': 'Faol',
+    'myListings.sold': 'Sotilgan',
+    'myListings.empty_active': 'Faol eʻlonlar yoʻq',
+    'myListings.empty_active_desc': 'Mahsulot qoʻshib sotishni boshlang',
+    'myListings.empty_sold': 'Sotilgan mahsulotlar yoʻq',
+    'myListings.empty_sold_desc': 'Tugallangan savdolar shu yerda chiqadi',
+    'myListings.mark_sold': 'Sotildi deb belgilash',
+    'myListings.marked_sold': 'Sotildi deb belgilandi!',
+    'myListings.reactivate': 'Qayta tiklash',
+    'myListings.reactivated': 'Qayta tiklandi!',
+    'myListings.delete': 'Oʻchirish',
+    'myListings.delete_title': 'Mahsulotni oʻchirish',
+    'myListings.delete_confirm': 'Bu mahsulotni oʻchirishga ishonchingiz komilmi?',
+    'myListings.deleted': 'Eʻlon oʻchirildi',
 
     // Favorites
     'favorites.browse': 'Mahsulotlarni koʻzdan kechirish',

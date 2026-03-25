@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User, Product, Chat, Message, Notification } from '../types';
+export type { Notification };
 
 // Helper to generate unique IDs without crypto.randomUUID (not available in RN)
 function generateId(): string {
@@ -172,6 +173,29 @@ export async function markNotificationRead(id: string): Promise<void> {
         notifs[idx].isRead = true;
         await setAS(COLLECTION_NOTIFICATIONS, notifs);
     }
+}
+
+export async function markAllNotificationsRead(userId: string): Promise<void> {
+    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
+    let changed = false;
+    for (const n of notifs) {
+        if (n.userId === userId && !n.isRead) {
+            n.isRead = true;
+            changed = true;
+        }
+    }
+    if (changed) await setAS(COLLECTION_NOTIFICATIONS, notifs);
+}
+
+export async function createNotification(notif: Notification): Promise<void> {
+    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
+    notifs.push(notif);
+    await setAS(COLLECTION_NOTIFICATIONS, notifs);
+}
+
+export async function fetchUnreadNotificationCount(userId: string): Promise<number> {
+    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
+    return notifs.filter((n: any) => n.userId === userId && !n.isRead).length;
 }
 
 // --- Storage ---

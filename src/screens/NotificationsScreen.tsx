@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { ArrowLeft, Bell, MessageCircle, Heart, Tag, Star, AlertCircle, Package } from 'lucide-react-native';
+import { ArrowLeft, Bell, MessageCircle, Heart, Tag, Star, AlertCircle, Package, CheckCheck } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -47,6 +48,7 @@ export default function NotificationsScreen() {
     const { user } = useAuth();
     const { t } = useLanguage();
     const navigation = useNavigation<any>();
+    const insets = useSafeAreaInsets();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -60,6 +62,14 @@ export default function NotificationsScreen() {
         };
         loadNotifs();
     }, [user]);
+
+    const hasUnread = notifications.some(n => !n.isRead);
+
+    const handleMarkAllRead = async () => {
+        if (!user) return;
+        await db.markAllNotificationsRead(user.id);
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    };
 
     const handlePress = async (notif: Notification) => {
         if (!notif.isRead) {
@@ -82,11 +92,16 @@ export default function NotificationsScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
+            <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <ArrowLeft size={22} color="#334155" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
+                {hasUnread && (
+                    <TouchableOpacity onPress={handleMarkAllRead} style={styles.markAllButton}>
+                        <CheckCheck size={18} color="#10b981" />
+                    </TouchableOpacity>
+                )}
             </View>
 
             <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
@@ -149,6 +164,9 @@ const styles = StyleSheet.create({
     },
     backButton: {
         padding: 4,
+    },
+    markAllButton: {
+        padding: 6,
     },
     headerTitle: {
         flex: 1,

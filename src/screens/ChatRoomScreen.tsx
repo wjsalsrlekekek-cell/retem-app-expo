@@ -205,6 +205,21 @@ export default function ChatRoomScreen() {
     };
 
     await db.sendMessage(chatId, msg, messageText);
+
+    // Create notification for the other user
+    if (chat) {
+      const recipientId = chat.buyerId === user.id ? chat.sellerId : chat.buyerId;
+      await db.createNotification({
+        id: db.generateId(),
+        userId: recipientId,
+        type: 'message',
+        title: user.name,
+        body: messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText,
+        relatedId: chatId,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
   }, [text, user, chat, chatId]);
 
   const handleAcceptOffer = useCallback(

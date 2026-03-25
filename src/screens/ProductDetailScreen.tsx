@@ -127,6 +127,20 @@ export default function ProductDetailScreen() {
       prev ? { ...prev, likes: prev.likes + (liked ? 1 : -1) } : prev,
     );
     showToast(t(liked ? 'toast.added_favorite' : 'toast.removed_favorite'));
+
+    // Notify seller when their product is liked
+    if (liked && product && product.sellerId !== user.id) {
+      await db.createNotification({
+        id: db.generateId(),
+        userId: product.sellerId,
+        type: 'like',
+        title: t('notifications.like_title') || 'New Like',
+        body: `${user.name} ${t('notifications.liked_your') || 'liked your'} "${product.title}"`,
+        relatedId: productId,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      });
+    }
   };
 
   const handleChat = async () => {

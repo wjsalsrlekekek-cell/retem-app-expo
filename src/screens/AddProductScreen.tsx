@@ -272,6 +272,19 @@ export default function AddProductScreen() {
 
     try {
       await db.createProductDoc(product);
+
+      // System notification confirming listing
+      await db.createNotification({
+        id: db.generateId(),
+        userId: user.id,
+        type: 'system',
+        title: t('notifications.product_listed_title') || 'Product Listed',
+        body: `"${title}" ${t('notifications.product_listed_body') || 'has been successfully listed!'}`,
+        relatedId: product.id,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      });
+
       showToast(t('toast.product_published'));
       navigation.navigate('ProductDetail', { productId: product.id });
     } catch {

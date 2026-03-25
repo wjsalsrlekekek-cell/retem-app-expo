@@ -45,6 +45,7 @@ export type HomeStackParamList = {
   HomeScreen: undefined;
   ProductDetail: { productId: string };
   AddProduct: undefined;
+  Notifications: undefined;
 };
 
 export type ChatStackParamList = {
@@ -100,6 +101,7 @@ function HomeStack() {
       <HomeStackNav.Screen name="HomeScreen" component={HomeScreen} />
       <HomeStackNav.Screen name="ProductDetail" component={ProductDetailScreen} />
       <HomeStackNav.Screen name="AddProduct" component={AddProductScreen} />
+      <HomeStackNav.Screen name="Notifications" component={NotificationsScreen} />
     </HomeStackNav.Navigator>
   );
 }

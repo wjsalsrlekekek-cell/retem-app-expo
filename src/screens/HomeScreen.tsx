@@ -26,6 +26,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import * as db from '../lib/db';
 import type { Product, User } from '../types';
 import type { HomeStackParamList } from '../navigation/AppNavigator';
@@ -138,7 +139,9 @@ export default function HomeScreen() {
   const [sellersMap, setSellersMap] = useState<Record<string, User>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { t } = useLanguage();
+  const { user } = useAuth();
   const navigation = useNavigation<HomeNav>();
   const insets = useSafeAreaInsets();
 
@@ -161,6 +164,18 @@ export default function HomeScreen() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  // Poll unread notification count
+  useEffect(() => {
+    if (!user) return;
+    const loadCount = async () => {
+      const count = await db.fetchUnreadNotificationCount(user.id);
+      setUnreadCount(count);
+    };
+    loadCount();
+    const interval = setInterval(loadCount, 3000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -261,8 +276,18 @@ export default function HomeScreen() {
           >
             <Search size={22} color="#334155" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIconButton}>
+          <TouchableOpacity
+            style={styles.headerIconButton}
+            onPress={() => navigation.navigate('Notifications')}
+          >
             <Bell size={22} color="#334155" />
+            {unreadCount > 0 && (
+              <View style={styles.notifBadge}>
+                <Text style={styles.notifBadgeText}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -412,6 +437,27 @@ const styles = StyleSheet.create({
   },
   headerIconButton: {
     padding: 6,
+    position: 'relative',
+  },
+  notifBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#ffffff',
+  },
+  notifBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 12,
   },
   // Categories
   categoryContainer: {

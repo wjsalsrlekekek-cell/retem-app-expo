@@ -26,7 +26,12 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +41,12 @@
         "projectId": "e9b820f8-d180-4667-8e06-d256df8c08d5"
       }
     },
-    "owner": "retem"
+    "owner": "retem",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e9b820f8-d180-4667-8e06-d256df8c08d5"
+    }
   }
 }

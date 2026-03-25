@@ -283,6 +283,11 @@ export const en = {
     'notifications.title': 'Notifications',
     'notifications.empty': 'No notifications',
     'notifications.empty_desc': "You're all caught up!",
+    'notifications.like_title': 'New Like',
+    'notifications.liked_your': 'liked your',
+    'notifications.product_listed_title': 'Product Listed',
+    'notifications.product_listed_body': 'has been successfully listed!',
+    'notifications.mark_all_read': 'Mark all read',
 
     // Reviews
     'reviews.title': 'Reviews',
@@ -349,6 +354,21 @@ export const en = {
     'mylistings.marked_sold': 'Marked as sold!',
     'mylistings.deleted': 'Product deleted',
     'mylistings.reactivated': 'Listing reactivated!',
+    'myListings.title': 'My Products',
+    'myListings.active': 'Active',
+    'myListings.sold': 'Sold',
+    'myListings.empty_active': 'No active listings',
+    'myListings.empty_active_desc': 'Start selling by adding a product',
+    'myListings.empty_sold': 'No sold items',
+    'myListings.empty_sold_desc': 'Items you sell will appear here',
+    'myListings.mark_sold': 'Mark as Sold',
+    'myListings.marked_sold': 'Marked as sold!',
+    'myListings.reactivate': 'Reactivate',
+    'myListings.reactivated': 'Listing reactivated!',
+    'myListings.delete': 'Delete',
+    'myListings.delete_title': 'Delete Product',
+    'myListings.delete_confirm': 'Are you sure you want to delete this product?',
+    'myListings.deleted': 'Product deleted',
 
     // Favorites
     'favorites.browse': 'Browse products',

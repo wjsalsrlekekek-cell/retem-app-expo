@@ -37,6 +37,8 @@ jobs:
 
       - name: Build APK
         run: eas build -p android --profile preview --non-interactive --local
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

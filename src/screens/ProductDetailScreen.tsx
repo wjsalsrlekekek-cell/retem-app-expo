@@ -146,7 +146,7 @@ export default function ProductDetailScreen() {
   const handleChat = async () => {
     if (!user || !product || !seller) return;
     if (user.id === seller.id) {
-      showToast('You cannot chat with yourself', 'error');
+      showToast(t('error.chat_self') || 'You cannot chat with yourself', 'error');
       return;
     }
     let chat = await db.fetchChatByParticipants(product.id, user.id, seller.id);
@@ -230,7 +230,7 @@ export default function ProductDetailScreen() {
   if (!product) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.notFoundText}>Product not found</Text>
+        <Text style={styles.notFoundText}>{t('error.product_not_found') || 'Product not found'}</Text>
       </View>
     );
   }

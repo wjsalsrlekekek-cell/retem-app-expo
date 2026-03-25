@@ -167,7 +167,10 @@ export default function AddProductScreen() {
   const pickImages = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Please allow access to your photo library.');
+      Alert.alert(
+        t('product.add.gallery_permission_title') || 'Permission Required',
+        t('product.add.gallery_permission_msg') || 'Please allow access to your photo library.'
+      );
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -188,7 +191,7 @@ export default function AddProductScreen() {
         }
         setImages([...images, ...newImages]);
       } catch {
-        showToast('Failed to upload image', 'error');
+        showToast(t('error.upload_failed') || 'Failed to upload image', 'error');
       } finally {
         setIsSubmitting(false);
       }
@@ -215,7 +218,7 @@ export default function AddProductScreen() {
         const url = await db.uploadImage(result.assets[0].uri);
         setImages([...images, url]);
       } catch {
-        showToast('Failed to upload image', 'error');
+        showToast(t('error.upload_failed') || 'Failed to upload image', 'error');
       } finally {
         setIsSubmitting(false);
       }

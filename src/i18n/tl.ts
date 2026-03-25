@@ -422,4 +422,18 @@ export const tl: Record<string, string> = {
 
     'product.status_active': 'Active', 'product.status_reserved': 'Reserved', 'product.status_sold': 'Nabenta',
     'product.mark_reserved': 'I-mark bilang Reserved', 'product.mark_sold': 'I-mark bilang Nabenta', 'product.mark_active': 'I-activate Ulit',
+
+    'error.chat_self': 'Hindi ka maaaring makipag-chat sa iyong sarili',
+    'error.product_not_found': 'Hindi nahanap ang produkto',
+    'error.upload_failed': 'Nabigong mag-upload ng larawan',
+    'product.add.gallery_permission_title': 'Kailangan ng Pahintulot',
+    'product.add.gallery_permission_msg': 'Pakipayagan ang access sa iyong photo library.',
+
+    // Password reset
+    'auth.login.forgot_password': 'Nakalimutan ang password?',
+    'auth.reset.sent': 'Naipadala na ang password reset email. Pakitingnan ang iyong inbox.',
+    'error.enter_email_for_reset': 'Pakilagay ang iyong email para i-reset ang password',
+    'error.user_not_found': 'Walang account na nahanap sa email na ito',
+    'error.invalid_email': 'Hindi valid ang email address',
+    'error.reset_failed': 'Nabigong i-reset ang password',
 };

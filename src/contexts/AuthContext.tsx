@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  GoogleAuthProvider,
+  signInWithCredential,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import type { ReactNode } from 'react';
 import type { User } from '../types';
 
@@ -11,133 +20,149 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<string | null>;
   signup: (email: string, password: string, fullName: string) => Promise<string | null>;
   loginWithGoogle: () => Promise<string | null>;
+  resetPassword: (email: string) => Promise<string | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const USERS_KEY = 'retem_users';
-const CURRENT_USER_KEY = 'retem_current_user_id';
-
-async function simpleHash(str: string): Promise<string> {
-  return await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    str
-  );
-}
-
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
-async function getUsers(): Promise<User[]> {
-  const raw = await AsyncStorage.getItem(USERS_KEY);
-  return raw ? JSON.parse(raw) : [];
-}
-
-async function saveUsers(users: User[]): Promise<void> {
-  await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen to Firebase Auth state changes
   useEffect(() => {
-    (async () => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        const storedId = await AsyncStorage.getItem(CURRENT_USER_KEY);
-        if (storedId) {
-          const users = await getUsers();
-          const found = users.find((u: User) => u.id === storedId);
-          if (found) setUser(found);
+        if (firebaseUser) {
+          // Fetch user profile from Firestore
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            setUser({ id: userDoc.id, ...userDoc.data() } as User);
+          } else {
+            // User exists in Auth but not in Firestore — create profile
+            const newUser: Omit<User, 'id'> = {
+              email: firebaseUser.email ?? '',
+              passwordHash: '',
+              fullName: firebaseUser.displayName ?? firebaseUser.email?.split('@')[0] ?? '',
+              profileImage: firebaseUser.photoURL ?? `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(firebaseUser.email ?? '')}`,
+              language: 'en',
+              location: '',
+              verified: false,
+              verificationStatus: 'none',
+              trustScore: 0,
+              authProvider: 'email',
+              isActive: true,
+              lastLoginAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+            setUser({ id: firebaseUser.uid, ...newUser });
+          }
+        } else {
+          setUser(null);
         }
       } catch (e) {
         console.error('Error restoring auth state:', e);
+        setUser(null);
       } finally {
         setLoading(false);
       }
-    })();
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const refreshUser = async () => {
     if (!user) return;
-    const users = await getUsers();
-    const found = users.find((u: User) => u.id === user.id);
-    if (found) setUser(found);
+    const userDoc = await getDoc(doc(db, 'users', user.id));
+    if (userDoc.exists()) {
+      setUser({ id: userDoc.id, ...userDoc.data() } as User);
+    }
   };
 
   const login = async (email: string, password: string): Promise<string | null> => {
-    const users = await getUsers();
-    const found = users.find((u: User) => u.email === email);
-
-    if (!found) return 'error.login_failed';
-
-    const hash = await simpleHash(password);
-    if (found.passwordHash !== hash && found.passwordHash !== 'local_mock') {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // onAuthStateChanged will handle setting the user
+      return null;
+    } catch (error: any) {
+      console.error('Login error:', error.code);
       return 'error.login_failed';
     }
-
-    // Migrate legacy accounts that have 'local_mock' as password hash
-    if (found.passwordHash === 'local_mock') {
-      found.passwordHash = hash;
-      await saveUsers(users);
-    }
-
-    setUser(found);
-    await AsyncStorage.setItem(CURRENT_USER_KEY, found.id);
-    return null;
   };
 
   const signup = async (email: string, password: string, fullName: string): Promise<string | null> => {
-    const users = await getUsers();
-    if (users.find((u: User) => u.email === email)) return 'error.email_exists';
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = credential.user;
 
-    const newUser: User = {
-      id: generateUUID(),
-      email,
-      passwordHash: await simpleHash(password),
-      fullName,
-      profileImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fullName)}`,
-      language: 'en',
-      location: '',
-      verified: false,
-      verificationStatus: 'none',
-      trustScore: 0,
-      authProvider: 'email',
-      isActive: true,
-      lastLoginAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+      // Create user profile in Firestore
+      const newUser: Omit<User, 'id'> = {
+        email,
+        passwordHash: '',
+        fullName,
+        profileImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(fullName)}`,
+        language: 'en',
+        location: '',
+        verified: false,
+        verificationStatus: 'none',
+        trustScore: 0,
+        authProvider: 'email',
+        isActive: true,
+        lastLoginAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
 
-    users.push(newUser);
-    await saveUsers(users);
-    await AsyncStorage.setItem(CURRENT_USER_KEY, newUser.id);
-    setUser(newUser);
-    return null;
+      await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+      setUser({ id: firebaseUser.uid, ...newUser });
+      return null;
+    } catch (error: any) {
+      console.error('Signup error:', error.code);
+      if (error.code === 'auth/email-already-in-use') {
+        return 'error.email_exists';
+      }
+      return 'error.login_failed';
+    }
   };
 
   const loginWithGoogle = async (): Promise<string | null> => {
-    // Google sign-in is not yet implemented for React Native.
-    // This would require expo-auth-session or @react-native-google-signin/google-signin.
-    // For now, return an error message.
+    // Google sign-in requires expo-auth-session setup
+    // Will be implemented with Google OAuth flow
     console.warn('Google sign-in is not yet implemented for React Native.');
     return 'error.login_failed';
   };
 
+  const resetPassword = async (email: string): Promise<string | null> => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return null; // success
+    } catch (error: any) {
+      console.error('Password reset error:', error.code);
+      if (error.code === 'auth/user-not-found') {
+        return 'error.user_not_found';
+      }
+      if (error.code === 'auth/invalid-email') {
+        return 'error.invalid_email';
+      }
+      return 'error.reset_failed';
+    }
+  };
+
   const logout = async () => {
-    setUser(null);
-    await AsyncStorage.removeItem(CURRENT_USER_KEY);
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: !!user, loading, login, signup, loginWithGoogle, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: !!user, loading, login, signup, loginWithGoogle, resetPassword, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

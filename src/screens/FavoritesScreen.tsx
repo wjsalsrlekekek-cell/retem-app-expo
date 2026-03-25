@@ -81,7 +81,7 @@ export default function FavoritesScreen() {
                                 style={styles.productItem}
                             >
                                 <Image
-                                    source={{ uri: product.images[0] || 'https://via.placeholder.com/80' }}
+                                    source={{ uri: product.images[0] }}
                                     style={styles.productImage}
                                 />
                                 <View style={styles.productInfo}>

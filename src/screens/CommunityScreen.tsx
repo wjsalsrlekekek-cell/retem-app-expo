@@ -85,7 +85,9 @@ export default function CommunityScreen() {
 
   // Translation state
   const [showTranslation, setShowTranslation] = useState<Record<string, boolean>>({});
+  const [translatedPosts, setTranslatedPosts] = useState<Record<string, string>>({});
   const [showCommentTranslation, setShowCommentTranslation] = useState<Record<string, boolean>>({});
+  const [translatedComments, setTranslatedComments] = useState<Record<string, string>>({});
 
   // Verification modal
   const [showVerifyModal, setShowVerifyModal] = useState(false);
@@ -254,13 +256,27 @@ export default function CommunityScreen() {
     }
   };
 
-  const togglePostTranslation = useCallback((postId: string) => {
+  const togglePostTranslation = useCallback(async (postId: string, content: string) => {
+    const isShowing = showTranslation[postId];
     setShowTranslation((prev) => ({ ...prev, [postId]: !prev[postId] }));
-  }, []);
+    if (!isShowing && !translatedPosts[postId]) {
+      const result = await translatePost(postId, language, content);
+      if (result) {
+        setTranslatedPosts((prev) => ({ ...prev, [postId]: result }));
+      }
+    }
+  }, [showTranslation, translatedPosts, language]);
 
-  const toggleCommentTranslation = useCallback((commentId: string) => {
+  const toggleCommentTranslation = useCallback(async (commentId: string, content: string) => {
+    const isShowing = showCommentTranslation[commentId];
     setShowCommentTranslation((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
-  }, []);
+    if (!isShowing && !translatedComments[commentId]) {
+      const result = await translateComment(commentId, language, content);
+      if (result) {
+        setTranslatedComments((prev) => ({ ...prev, [commentId]: result }));
+      }
+    }
+  }, [showCommentTranslation, translatedComments, language]);
 
   if (loading) {
     return (
@@ -391,7 +407,7 @@ export default function CommunityScreen() {
           posts.map((post) => {
             const isExpanded = expandedPostId === post.id;
             const liked = likedPosts[post.id] ?? false;
-            const translatedContent = showTranslation[post.id] ? translatePost(post.id, language) : null;
+            const translatedContent = showTranslation[post.id] ? translatedPosts[post.id] ?? null : null;
             const comments = postComments[post.id] || [];
 
             return (
@@ -425,7 +441,7 @@ export default function CommunityScreen() {
                 )}
 
                 {post.language !== language && (
-                  <TouchableOpacity onPress={() => togglePostTranslation(post.id)} style={styles.translateBtn}>
+                  <TouchableOpacity onPress={() => togglePostTranslation(post.id, post.content)} style={styles.translateBtn}>
                     <Globe size={14} color="#3b82f6" />
                     <Text style={styles.translateBtnText}>
                       {showTranslation[post.id]
@@ -482,7 +498,7 @@ export default function CommunityScreen() {
                     ) : (
                       comments.map((comment) => {
                         const commentTranslated = showCommentTranslation[comment.id]
-                          ? translateComment(comment.id, language)
+                          ? translatedComments[comment.id] ?? null
                           : null;
 
                         return (
@@ -514,7 +530,7 @@ export default function CommunityScreen() {
                               )}
 
                               <TouchableOpacity
-                                onPress={() => toggleCommentTranslation(comment.id)}
+                                onPress={() => toggleCommentTranslation(comment.id, comment.content)}
                                 style={styles.translateBtnSmall}
                               >
                                 <Globe size={11} color="#3b82f6" />

@@ -64,7 +64,7 @@ const conditionBg: Record<string, string> = {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
+  if (mins < 1) return 'now';
   if (mins < 60) return `${mins}m`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h`;
@@ -92,7 +92,7 @@ const ProductCard = React.memo(function ProductCard({ product, seller, onPress }
       activeOpacity={0.7}
     >
       <Image
-        source={{ uri: product.images[0] || 'https://via.placeholder.com/200' }}
+        source={{ uri: product.images[0] }}
         style={styles.productImage}
       />
       <View style={styles.productInfo}>
@@ -165,16 +165,20 @@ export default function HomeScreen() {
     loadProducts();
   }, [loadProducts]);
 
-  // Poll unread notification count
+  // Real-time unread notification count via Firestore onSnapshot
   useEffect(() => {
     if (!user) return;
-    const loadCount = async () => {
-      const count = await db.fetchUnreadNotificationCount(user.id);
-      setUnreadCount(count);
-    };
-    loadCount();
-    const interval = setInterval(loadCount, 3000);
-    return () => clearInterval(interval);
+    const { query: fsQuery, collection: fsCollection, where: fsWhere, onSnapshot: fsOnSnapshot } = require('firebase/firestore');
+    const { db: fireDb } = require('../lib/firebase');
+    const q = fsQuery(
+      fsCollection(fireDb, 'notifications'),
+      fsWhere('userId', '==', user.id),
+      fsWhere('isRead', '==', false)
+    );
+    const unsubscribe = fsOnSnapshot(q, (snap: any) => {
+      setUnreadCount(snap.size);
+    });
+    return () => unsubscribe();
   }, [user]);
 
   const onRefresh = useCallback(async () => {

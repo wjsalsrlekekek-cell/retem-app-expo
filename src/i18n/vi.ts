@@ -422,4 +422,18 @@ export const vi: Record<string, string> = {
 
     'product.status_active': 'Đang bán', 'product.status_reserved': 'Đã đặt trước', 'product.status_sold': 'Đã bán',
     'product.mark_reserved': 'Đánh dấu đặt trước', 'product.mark_sold': 'Đánh dấu đã bán', 'product.mark_active': 'Bán lại',
+
+    'error.chat_self': 'Bạn không thể trò chuyện với chính mình',
+    'error.product_not_found': 'Không tìm thấy sản phẩm',
+    'error.upload_failed': 'Tải ảnh lên thất bại',
+    'product.add.gallery_permission_title': 'Cần quyền truy cập',
+    'product.add.gallery_permission_msg': 'Vui lòng cho phép truy cập thư viện ảnh của bạn.',
+
+    // Password reset
+    'auth.login.forgot_password': 'Quên mật khẩu?',
+    'auth.reset.sent': 'Email đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.',
+    'error.enter_email_for_reset': 'Vui lòng nhập email để đặt lại mật khẩu',
+    'error.user_not_found': 'Không tìm thấy tài khoản với email này',
+    'error.invalid_email': 'Địa chỉ email không hợp lệ',
+    'error.reset_failed': 'Đặt lại mật khẩu thất bại',
 };

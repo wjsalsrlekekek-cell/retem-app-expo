@@ -422,4 +422,18 @@ export const zh: Record<string, string> = {
 
     'product.status_active': '在售', 'product.status_reserved': '已预留', 'product.status_sold': '已售',
     'product.mark_reserved': '标为已预留', 'product.mark_sold': '标为已售', 'product.mark_active': '重新上架',
+
+    'error.chat_self': '无法与自己聊天',
+    'error.product_not_found': '未找到商品',
+    'error.upload_failed': '图片上传失败',
+    'product.add.gallery_permission_title': '需要权限',
+    'product.add.gallery_permission_msg': '请允许访问您的照片库。',
+
+    // Password reset
+    'auth.login.forgot_password': '忘记密码？',
+    'auth.reset.sent': '密码重置邮件已发送，请查收。',
+    'error.enter_email_for_reset': '请输入邮箱以重置密码',
+    'error.user_not_found': '未找到该邮箱的账户',
+    'error.invalid_email': '无效的邮箱地址',
+    'error.reset_failed': '密码重置失败',
 };

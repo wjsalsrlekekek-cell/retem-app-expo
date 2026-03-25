@@ -422,4 +422,18 @@ export const ja: Record<string, string> = {
 
     'product.status_active': '販売中', 'product.status_reserved': '予約済み', 'product.status_sold': '売却済み',
     'product.mark_reserved': '予約済みに変更', 'product.mark_sold': '売却済みに変更', 'product.mark_active': '再出品',
+
+    'error.chat_self': '自分自身とはチャットできません',
+    'error.product_not_found': '商品が見つかりません',
+    'error.upload_failed': '画像のアップロードに失敗しました',
+    'product.add.gallery_permission_title': '権限が必要です',
+    'product.add.gallery_permission_msg': 'フォトライブラリへのアクセスを許可してください。',
+
+    // Password reset
+    'auth.login.forgot_password': 'パスワードをお忘れですか？',
+    'auth.reset.sent': 'パスワードリセットメールを送信しました。メールをご確認ください。',
+    'error.enter_email_for_reset': 'パスワードリセットのためにメールアドレスを入力してください',
+    'error.user_not_found': 'このメールアドレスのアカウントが見つかりません',
+    'error.invalid_email': '無効なメールアドレスです',
+    'error.reset_failed': 'パスワードのリセットに失敗しました',
 };

@@ -28,7 +28,8 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { login, loginWithGoogle } = useAuth();
+  const [resetLoading, setResetLoading] = useState(false);
+  const { login, loginWithGoogle, resetPassword } = useAuth();
   const { t } = useLanguage();
   const { showToast } = useToast();
   const navigation = useNavigation<LoginNav>();
@@ -51,6 +52,27 @@ export default function LoginScreen() {
       setError('Login failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError(t('error.enter_email_for_reset'));
+      return;
+    }
+    setResetLoading(true);
+    setError('');
+    try {
+      const err = await resetPassword(email);
+      if (err) {
+        setError(t(err) || t('error.reset_failed'));
+      } else {
+        showToast(t('auth.reset.sent'));
+      }
+    } catch {
+      setError(t('error.reset_failed'));
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -133,6 +155,17 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Forgot Password */}
+        <TouchableOpacity
+          onPress={handleResetPassword}
+          disabled={resetLoading}
+          style={styles.forgotButton}
+        >
+          <Text style={styles.forgotText}>
+            {resetLoading ? t('common.loading') : t('auth.login.forgot_password')}
+          </Text>
+        </TouchableOpacity>
 
         {/* Login Button */}
         <TouchableOpacity
@@ -324,5 +357,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#10b981',
     fontWeight: '600',
+  },
+  forgotButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 8,
+    marginTop: -8,
+  },
+  forgotText: {
+    fontSize: 13,
+    color: '#64748b',
+    fontWeight: '500',
   },
 });

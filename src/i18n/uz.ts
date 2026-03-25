@@ -534,4 +534,18 @@ export const uz = {
     'product.mark_reserved': 'Band qilish',
     'product.mark_sold': 'Sotib olindi',
     'product.mark_active': 'Tiklash',
+
+    'error.chat_self': 'Oʻzingiz bilan suhbatlasha olmaysiz',
+    'error.product_not_found': 'Mahsulot topilmadi',
+    'error.upload_failed': 'Rasm yuklash muvaffaqiyatsiz',
+    'product.add.gallery_permission_title': 'Ruxsat kerak',
+    'product.add.gallery_permission_msg': 'Iltimos, foto kutubxonangizga kirishga ruxsat bering.',
+
+    // Password reset
+    'auth.login.forgot_password': 'Parolni unutdingizmi?',
+    'auth.reset.sent': 'Parolni tiklash uchun email yuborildi. Pochta qutingizni tekshiring.',
+    'error.enter_email_for_reset': 'Parolni tiklash uchun emailingizni kiriting',
+    'error.user_not_found': 'Bu email bilan hisob topilmadi',
+    'error.invalid_email': 'Email manzili notoʻgʻri',
+    'error.reset_failed': 'Parolni tiklash muvaffaqiyatsiz',
 };

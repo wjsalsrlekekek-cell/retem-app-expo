@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users: 본인만 수정 가능
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Products: 누구나 읽기, 판매자만 수정/삭제
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.sellerId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.sellerId == request.auth.uid;
+    }
+
+    // Chats: 참여자만 읽기/쓰기
+    match /chats/{chatId} {
+      allow read: if request.auth != null
+                  && (resource.data.buyerId == request.auth.uid
+                      || resource.data.sellerId == request.auth.uid);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                    && (resource.data.buyerId == request.auth.uid
+                        || resource.data.sellerId == request.auth.uid);
+    }
+
+    // Messages: 채팅 참여자만 (부모 chat 문서의 참여자 확인)
+    match /chats/{chatId}/messages/{messageId} {
+      allow read, write: if request.auth != null
+                         && exists(/databases/$(database)/documents/chats/$(chatId))
+                         && (get(/databases/$(database)/documents/chats/$(chatId)).data.buyerId == request.auth.uid
+                             || get(/databases/$(database)/documents/chats/$(chatId)).data.sellerId == request.auth.uid);
+    }
+
+    // Notifications: 본인 알림만 읽기, 본인 알림만 수정(읽음 처리)
+    match /notifications/{notifId} {
+      allow read: if request.auth != null
+                  && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+    }
+
+    // Reviews: 누구나 읽기, 작성자만 수정
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.reviewerId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.reviewerId == request.auth.uid;
+    }
+
+    // Posts: 누구나 읽기, 작성자만 수정
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.authorId == request.auth.uid;
+    }
+
+    // Comments: 누구나 읽기, 작성자만 수정
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.authorId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.authorId == request.auth.uid;
+    }
+
+    // Favorites: 본인 즐겨찾기만 관리
+    match /favorites/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
+    // PostLikes
+    match /postLikes/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+  }
+}

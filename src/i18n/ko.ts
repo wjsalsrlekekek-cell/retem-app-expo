@@ -426,4 +426,19 @@ export const ko: Record<string, string> = {
 
     'product.status_active': '판매중', 'product.status_reserved': '예약중', 'product.status_sold': '판매완료',
     'product.mark_reserved': '예약중으로 변경', 'product.mark_sold': '판매완료로 변경', 'product.mark_active': '다시 판매하기',
+
+    // Additional error messages
+    'error.chat_self': '자신과는 채팅할 수 없습니다',
+    'error.product_not_found': '상품을 찾을 수 없습니다',
+    'error.upload_failed': '이미지 업로드에 실패했습니다',
+    'product.add.gallery_permission_title': '권한 필요',
+    'product.add.gallery_permission_msg': '사진 라이브러리에 접근하려면 권한을 허용해주세요.',
+
+    // Password reset
+    'auth.login.forgot_password': '비밀번호를 잊으셨나요?',
+    'auth.reset.sent': '비밀번호 재설정 이메일을 보냈습니다. 이메일을 확인해주세요.',
+    'error.enter_email_for_reset': '비밀번호 재설정을 위해 이메일을 입력해주세요',
+    'error.user_not_found': '등록되지 않은 이메일입니다',
+    'error.invalid_email': '유효하지 않은 이메일입니다',
+    'error.reset_failed': '비밀번호 재설정에 실패했습니다',
 };

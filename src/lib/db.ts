@@ -1,212 +1,231 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebase';
 import type { User, Product, Chat, Message, Notification } from '../types';
+
 export type { Notification };
 
-// Helper to generate unique IDs without crypto.randomUUID (not available in RN)
-function generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+// Helper to generate unique IDs
+export function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
-
-// Helpers for AsyncStorage
-async function getAS(key: string): Promise<any[]> {
-    try {
-        const raw = await AsyncStorage.getItem(key);
-        return raw ? JSON.parse(raw) : [];
-    } catch {
-        return [];
-    }
-}
-
-async function setAS(key: string, val: any): Promise<void> {
-    await AsyncStorage.setItem(key, JSON.stringify(val));
-}
-
-export const COLLECTION_USERS = 'retem_users';
-export const COLLECTION_PRODUCTS = 'retem_products';
-export const COLLECTION_CHATS = 'retem_chats';
-export const COLLECTION_MESSAGES = 'retem_messages';
-export const COLLECTION_NOTIFICATIONS = 'retem_notifications';
 
 // --- Users ---
 export async function fetchUser(uid: string): Promise<User | null> {
-    const users = await getAS(COLLECTION_USERS);
-    return users.find((u: any) => u.id === uid) || null;
+  const snap = await getDoc(doc(db, 'users', uid));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as User;
 }
 
 export async function createUserDoc(user: User): Promise<void> {
-    const users = await getAS(COLLECTION_USERS);
-    const existing = users.findIndex((u: any) => u.id === user.id);
-    if (existing >= 0) users[existing] = user;
-    else users.push(user);
-    await setAS(COLLECTION_USERS, users);
+  const { id, ...data } = user;
+  await setDoc(doc(db, 'users', id), data);
 }
 
 export async function updateUserDoc(uid: string, data: Partial<User>): Promise<void> {
-    const users = await getAS(COLLECTION_USERS);
-    const idx = users.findIndex((u: any) => u.id === uid);
-    if (idx >= 0) {
-        users[idx] = { ...users[idx], ...data };
-        await setAS(COLLECTION_USERS, users);
-    }
+  const userRef = doc(db, 'users', uid);
+  const snap = await getDoc(userRef);
+  if (snap.exists()) {
+    await updateDoc(userRef, { ...data, updatedAt: new Date().toISOString() });
+  }
 }
 
 // --- Products ---
 export async function fetchProducts(): Promise<Product[]> {
-    return await getAS(COLLECTION_PRODUCTS);
+  const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Product));
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
-    const products = await getAS(COLLECTION_PRODUCTS);
-    return products.find((p: any) => p.id === id) || null;
+  const snap = await getDoc(doc(db, 'products', id));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as Product;
 }
 
 export async function createProductDoc(product: Product): Promise<void> {
-    const products = await getAS(COLLECTION_PRODUCTS);
-    products.push(product);
-    await setAS(COLLECTION_PRODUCTS, products);
+  const { id, ...data } = product;
+  await setDoc(doc(db, 'products', id), data);
 }
 
 export async function updateProductDoc(id: string, data: Partial<Product>): Promise<void> {
-    const products = await getAS(COLLECTION_PRODUCTS);
-    const idx = products.findIndex((p: any) => p.id === id);
-    if (idx >= 0) {
-        products[idx] = { ...products[idx], ...data };
-        await setAS(COLLECTION_PRODUCTS, products);
-    }
+  const productRef = doc(db, 'products', id);
+  await updateDoc(productRef, { ...data, updatedAt: new Date().toISOString() });
 }
 
 // --- Chats ---
 export async function createChat(chat: Chat): Promise<void> {
-    const chats = await getAS(COLLECTION_CHATS);
-    if (!chats.find((c: any) => c.id === chat.id)) {
-        chats.push(chat);
-        await setAS(COLLECTION_CHATS, chats);
-    }
+  const chatRef = doc(db, 'chats', chat.id);
+  const snap = await getDoc(chatRef);
+  if (!snap.exists()) {
+    const { id, ...data } = chat;
+    await setDoc(chatRef, data);
+  }
 }
 
 export async function fetchUserChats(userId: string): Promise<Chat[]> {
-    const chats = await getAS(COLLECTION_CHATS);
-    return chats.filter((c: any) => c.buyerId === userId || c.sellerId === userId)
-        .sort((a: any, b: any) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
+  // Firestore doesn't support OR queries across different fields easily,
+  // so we do two queries and merge
+  const buyerQ = query(collection(db, 'chats'), where('buyerId', '==', userId));
+  const sellerQ = query(collection(db, 'chats'), where('sellerId', '==', userId));
+
+  const [buyerSnap, sellerSnap] = await Promise.all([getDocs(buyerQ), getDocs(sellerQ)]);
+
+  const chatMap = new Map<string, Chat>();
+  for (const d of buyerSnap.docs) {
+    chatMap.set(d.id, { id: d.id, ...d.data() } as Chat);
+  }
+  for (const d of sellerSnap.docs) {
+    chatMap.set(d.id, { id: d.id, ...d.data() } as Chat);
+  }
+
+  return Array.from(chatMap.values()).sort(
+    (a, b) => new Date(b.lastMessageAt ?? 0).getTime() - new Date(a.lastMessageAt ?? 0).getTime()
+  );
 }
 
 export async function fetchChatById(chatId: string): Promise<Chat | null> {
-    const chats = await getAS(COLLECTION_CHATS);
-    return chats.find((c: any) => c.id === chatId) || null;
+  const snap = await getDoc(doc(db, 'chats', chatId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as Chat;
 }
 
-// 채팅 참여자로 기존 채팅방 찾기
-export async function fetchChatByParticipants(productId: string, buyerId: string, sellerId: string): Promise<Chat | null> {
-    const chats = await getAS(COLLECTION_CHATS);
-    return chats.find((c: any) => c.productId === productId && c.buyerId === buyerId && c.sellerId === sellerId) || null;
+export async function fetchChatByParticipants(
+  productId: string,
+  buyerId: string,
+  sellerId: string
+): Promise<Chat | null> {
+  const q = query(
+    collection(db, 'chats'),
+    where('productId', '==', productId),
+    where('buyerId', '==', buyerId),
+    where('sellerId', '==', sellerId)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  return { id: d.id, ...d.data() } as Chat;
 }
 
-export async function sendMessage(chatId: string, message: Message, lastMessageText: string): Promise<void> {
-    // Save message to chat-specific key
-    const chatMessagesKey = `retem_messages_${chatId}`;
-    const chatMessages = await getAS(chatMessagesKey);
-    chatMessages.push(message);
-    await setAS(chatMessagesKey, chatMessages);
+export async function sendMessage(
+  chatId: string,
+  message: Message,
+  lastMessageText: string
+): Promise<void> {
+  // Save message to subcollection
+  const { id, ...msgData } = message;
+  await setDoc(doc(db, 'chats', chatId, 'messages', id), msgData);
 
-    // Update chat metadata
-    const chats = await getAS(COLLECTION_CHATS);
-    const idx = chats.findIndex((c: any) => c.id === chatId);
-    if (idx >= 0) {
-        chats[idx].lastMessage = lastMessageText;
-        chats[idx].lastMessageAt = message.createdAt;
-        await setAS(COLLECTION_CHATS, chats);
-    }
+  // Update chat metadata
+  await updateDoc(doc(db, 'chats', chatId), {
+    lastMessage: lastMessageText,
+    lastMessageAt: message.createdAt,
+  });
 }
 
-// 폴링 방식으로 실시간 메시지 구독 (AsyncStorage 기반)
-export function subscribeToMessages(chatId: string, callback: (messages: Message[]) => void): () => void {
-    const chatMessagesKey = `retem_messages_${chatId}`;
+// Real-time message subscription using Firestore onSnapshot
+export function subscribeToMessages(
+  chatId: string,
+  callback: (messages: Message[]) => void
+): () => void {
+  const q = query(
+    collection(db, 'chats', chatId, 'messages'),
+    orderBy('createdAt', 'asc')
+  );
 
-    // 구 방식 (retem_messages 단일 배열)에서 메시지 마이그레이션
-    const migrateLegacy = async () => {
-        try {
-            const raw = await AsyncStorage.getItem(COLLECTION_MESSAGES);
-            const all: Message[] = raw ? JSON.parse(raw) : [];
-            const legacyMessages = all.filter((m: any) => m.chatId === chatId);
+  const unsubscribe = onSnapshot(q, (snap) => {
+    const messages = snap.docs.map(d => ({ id: d.id, ...d.data() } as Message));
+    callback(messages);
+  });
 
-            if (legacyMessages.length > 0) {
-                const existing = await getAS(chatMessagesKey);
-                const existingIds = new Set(existing.map((m: any) => m.id));
-                const toAdd = legacyMessages.filter((m: any) => !existingIds.has(m.id));
-                if (toAdd.length > 0) {
-                    await setAS(chatMessagesKey, [...existing, ...toAdd]);
-                }
-            }
-        } catch {
-            // ignore migration errors
-        }
-    };
-
-    const loadMessages = async () => {
-        const msgs = await getAS(chatMessagesKey);
-        msgs.sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        callback(msgs);
-    };
-
-    // Run migration then load
-    migrateLegacy().then(() => loadMessages());
-
-    // 500ms 마다 폴링하여 실시간 업데이트 시뮬레이션
-    const intervalId = setInterval(async () => {
-        await loadMessages();
-    }, 500);
-
-    return () => clearInterval(intervalId);
+  return unsubscribe;
 }
 
 // --- Notifications ---
 export async function fetchNotifications(userId: string): Promise<Notification[]> {
-    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
-    return notifs.filter((n: any) => n.userId === userId)
-        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const q = query(
+    collection(db, 'notifications'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Notification));
 }
 
 export async function markNotificationRead(id: string): Promise<void> {
-    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
-    const idx = notifs.findIndex((n: any) => n.id === id);
-    if (idx >= 0) {
-        notifs[idx].isRead = true;
-        await setAS(COLLECTION_NOTIFICATIONS, notifs);
-    }
+  await updateDoc(doc(db, 'notifications', id), { isRead: true });
 }
 
 export async function markAllNotificationsRead(userId: string): Promise<void> {
-    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
-    let changed = false;
-    for (const n of notifs) {
-        if (n.userId === userId && !n.isRead) {
-            n.isRead = true;
-            changed = true;
-        }
-    }
-    if (changed) await setAS(COLLECTION_NOTIFICATIONS, notifs);
+  const q = query(
+    collection(db, 'notifications'),
+    where('userId', '==', userId),
+    where('isRead', '==', false)
+  );
+  const snap = await getDocs(q);
+  const updates = snap.docs.map(d => updateDoc(d.ref, { isRead: true }));
+  await Promise.all(updates);
 }
 
 export async function createNotification(notif: Notification): Promise<void> {
-    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
-    notifs.push(notif);
-    await setAS(COLLECTION_NOTIFICATIONS, notifs);
+  const { id, ...data } = notif;
+  await setDoc(doc(db, 'notifications', id), data);
 }
 
 export async function fetchUnreadNotificationCount(userId: string): Promise<number> {
-    const notifs = await getAS(COLLECTION_NOTIFICATIONS);
-    return notifs.filter((n: any) => n.userId === userId && !n.isRead).length;
+  const q = query(
+    collection(db, 'notifications'),
+    where('userId', '==', userId),
+    where('isRead', '==', false)
+  );
+  const snap = await getDocs(q);
+  return snap.size;
 }
 
-// --- Storage ---
-export async function uploadImage(uri: string): Promise<string> {
-    // In a real app, upload to cloud storage and return the remote URL.
-    // For now, return the local file URI directly so the actual photo is displayed.
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(uri);
-        }, 300);
-    });
+// --- Storage (Image Upload) ---
+export async function uploadImage(
+  uri: string,
+  path: string = 'products'
+): Promise<string> {
+  try {
+    // Fetch the image as blob
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    // Generate unique filename
+    const filename = `${path}/${generateId()}_${Date.now()}.jpg`;
+    const storageRef = ref(storage, filename);
+
+    // Upload to Firebase Storage
+    await uploadBytes(storageRef, blob);
+
+    // Get the download URL
+    const downloadUrl = await getDownloadURL(storageRef);
+    return downloadUrl;
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    // Fallback to local URI if Storage is not yet activated
+    return uri;
+  }
 }
 
-export { generateId };
+// --- Firestore message update (for offer status) ---
+export async function updateMessage(
+  chatId: string,
+  messageId: string,
+  data: Partial<Message>
+): Promise<void> {
+  const msgRef = doc(db, 'chats', chatId, 'messages', messageId);
+  await updateDoc(msgRef, data);
+}

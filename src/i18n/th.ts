@@ -422,4 +422,18 @@ export const th: Record<string, string> = {
 
     'product.status_active': 'ขายอยู่', 'product.status_reserved': 'จองแล้ว', 'product.status_sold': 'ขายแล้ว',
     'product.mark_reserved': 'ทำเครื่องหมายจองแล้ว', 'product.mark_sold': 'ทำเครื่องหมายขายแล้ว', 'product.mark_active': 'ขายอีกครั้ง',
+
+    'error.chat_self': 'ไม่สามารถแชทกับตัวเองได้',
+    'error.product_not_found': 'ไม่พบสินค้า',
+    'error.upload_failed': 'อัปโหลดรูปภาพไม่สำเร็จ',
+    'product.add.gallery_permission_title': 'ต้องการสิทธิ์',
+    'product.add.gallery_permission_msg': 'กรุณาอนุญาตการเข้าถึงคลังรูปภาพของคุณ',
+
+    // Password reset
+    'auth.login.forgot_password': 'ลืมรหัสผ่าน?',
+    'auth.reset.sent': 'ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว กรุณาตรวจสอบอีเมลของคุณ',
+    'error.enter_email_for_reset': 'กรุณากรอกอีเมลเพื่อรีเซ็ตรหัสผ่าน',
+    'error.user_not_found': 'ไม่พบบัญชีที่ใช้อีเมลนี้',
+    'error.invalid_email': 'ที่อยู่อีเมลไม่ถูกต้อง',
+    'error.reset_failed': 'รีเซ็ตรหัสผ่านไม่สำเร็จ',
 };

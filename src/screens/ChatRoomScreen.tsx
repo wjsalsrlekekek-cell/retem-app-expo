@@ -213,7 +213,7 @@ export default function ChatRoomScreen() {
         id: db.generateId(),
         userId: recipientId,
         type: 'message',
-        title: user.name,
+        title: user.fullName,
         body: messageText.length > 50 ? messageText.substring(0, 50) + '...' : messageText,
         relatedId: chatId,
         isRead: false,
@@ -230,15 +230,10 @@ export default function ChatRoomScreen() {
       const offerContent: OfferContent = JSON.parse(msg.content);
       offerContent.status = 'accepted';
 
-      // Update in AsyncStorage directly
-      const chatMessagesKey = `retem_messages_${chatId}`;
-      const raw = await AsyncStorage.getItem(chatMessagesKey);
-      const allMsgs: Message[] = raw ? JSON.parse(raw) : [];
-      const idx = allMsgs.findIndex((m) => m.id === msg.id);
-      if (idx >= 0) {
-        allMsgs[idx].content = JSON.stringify(offerContent);
-        await AsyncStorage.setItem(chatMessagesKey, JSON.stringify(allMsgs));
-      }
+      // Update in Firestore
+      await db.updateMessage(chatId, msg.id, {
+        content: JSON.stringify(offerContent),
+      });
 
       showToast(t('chat.offer_accepted') || 'Offer accepted!');
     },
@@ -252,14 +247,10 @@ export default function ChatRoomScreen() {
       const offerContent: OfferContent = JSON.parse(msg.content);
       offerContent.status = 'rejected';
 
-      const chatMessagesKey = `retem_messages_${chatId}`;
-      const raw = await AsyncStorage.getItem(chatMessagesKey);
-      const allMsgs: Message[] = raw ? JSON.parse(raw) : [];
-      const idx = allMsgs.findIndex((m) => m.id === msg.id);
-      if (idx >= 0) {
-        allMsgs[idx].content = JSON.stringify(offerContent);
-        await AsyncStorage.setItem(chatMessagesKey, JSON.stringify(allMsgs));
-      }
+      // Update in Firestore
+      await db.updateMessage(chatId, msg.id, {
+        content: JSON.stringify(offerContent),
+      });
 
       showToast(t('chat.offer_rejected') || 'Offer rejected');
     },

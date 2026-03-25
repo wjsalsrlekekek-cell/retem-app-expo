@@ -422,4 +422,18 @@ export const id: Record<string, string> = {
 
     'product.status_active': 'Aktif', 'product.status_reserved': 'Dipesan', 'product.status_sold': 'Terjual',
     'product.mark_reserved': 'Tandai Dipesan', 'product.mark_sold': 'Tandai Terjual', 'product.mark_active': 'Aktifkan Lagi',
+
+    'error.chat_self': 'Anda tidak bisa chat dengan diri sendiri',
+    'error.product_not_found': 'Produk tidak ditemukan',
+    'error.upload_failed': 'Gagal mengunggah gambar',
+    'product.add.gallery_permission_title': 'Izin Diperlukan',
+    'product.add.gallery_permission_msg': 'Mohon izinkan akses ke galeri foto Anda.',
+
+    // Password reset
+    'auth.login.forgot_password': 'Lupa kata sandi?',
+    'auth.reset.sent': 'Email reset kata sandi telah dikirim. Silakan cek inbox Anda.',
+    'error.enter_email_for_reset': 'Masukkan email Anda untuk reset kata sandi',
+    'error.user_not_found': 'Tidak ditemukan akun dengan email ini',
+    'error.invalid_email': 'Alamat email tidak valid',
+    'error.reset_failed': 'Gagal mereset kata sandi',
 };

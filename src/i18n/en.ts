@@ -534,6 +534,21 @@ export const en = {
     'product.mark_reserved': 'Mark as Reserved',
     'product.mark_sold': 'Mark as Sold',
     'product.mark_active': 'Reactivate',
+
+    // Additional error messages
+    'error.chat_self': 'You cannot chat with yourself',
+    'error.product_not_found': 'Product not found',
+    'error.upload_failed': 'Failed to upload image',
+    'product.add.gallery_permission_title': 'Permission Required',
+    'product.add.gallery_permission_msg': 'Please allow access to your photo library.',
+
+    // Password reset
+    'auth.login.forgot_password': 'Forgot password?',
+    'auth.reset.sent': 'Password reset email sent. Please check your inbox.',
+    'error.enter_email_for_reset': 'Please enter your email to reset password',
+    'error.user_not_found': 'No account found with this email',
+    'error.invalid_email': 'Invalid email address',
+    'error.reset_failed': 'Failed to reset password',
 };
 
 export type TranslationKey = keyof typeof en;

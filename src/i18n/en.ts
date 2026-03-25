@@ -301,6 +301,7 @@ export const en = {
 
     // Common (additional)
     'common.cancel': 'Cancel',
+    'common.coming_soon': 'Coming Soon',
     'common.delete': 'Delete',
     'common.edit': 'Edit',
     'common.back': 'Back',
@@ -549,6 +550,8 @@ export const en = {
     'error.user_not_found': 'No account found with this email',
     'error.invalid_email': 'Invalid email address',
     'error.reset_failed': 'Failed to reset password',
+    'error.generic': 'Something went wrong',
+    'error.enter_review': 'Please enter a review',
 };
 
 export type TranslationKey = keyof typeof en;

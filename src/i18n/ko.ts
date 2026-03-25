@@ -213,6 +213,7 @@ export const ko: Record<string, string> = {
     'reviews.anonymous': '익명',
     'common.save': '저장',
     'common.cancel': '취소',
+    'common.coming_soon': '준비 중',
     'common.delete': '삭제',
     'common.edit': '수정',
     'common.back': '뒤로',
@@ -441,4 +442,6 @@ export const ko: Record<string, string> = {
     'error.user_not_found': '등록되지 않은 이메일입니다',
     'error.invalid_email': '유효하지 않은 이메일입니다',
     'error.reset_failed': '비밀번호 재설정에 실패했습니다',
+    'error.generic': '문제가 발생했습니다',
+    'error.enter_review': '리뷰를 입력해주세요',
 };

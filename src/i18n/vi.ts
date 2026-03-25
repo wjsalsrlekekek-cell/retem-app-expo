@@ -210,6 +210,7 @@ export const vi: Record<string, string> = {
     'reviews.anonymous': 'Ẩn danh',
     'common.save': 'Lưu',
     'common.cancel': 'Hủy',
+    'common.coming_soon': 'Sắp ra mắt',
     'common.delete': 'Xóa',
     'common.edit': 'Chỉnh sửa',
     'common.back': 'Quay lại',
@@ -436,4 +437,6 @@ export const vi: Record<string, string> = {
     'error.user_not_found': 'Không tìm thấy tài khoản với email này',
     'error.invalid_email': 'Địa chỉ email không hợp lệ',
     'error.reset_failed': 'Đặt lại mật khẩu thất bại',
+    'error.generic': 'Đã xảy ra lỗi',
+    'error.enter_review': 'Vui lòng nhập đánh giá',
 };

@@ -193,6 +193,20 @@ export async function fetchUnreadNotificationCount(userId: string): Promise<numb
   return snap.size;
 }
 
+export function subscribeToUnreadNotifications(
+  userId: string,
+  callback: (count: number) => void,
+): () => void {
+  const q = query(
+    collection(db, 'notifications'),
+    where('userId', '==', userId),
+    where('isRead', '==', false),
+  );
+  return onSnapshot(q, (snap) => {
+    callback(snap.size);
+  });
+}
+
 // --- Storage (Image Upload) ---
 export async function uploadImage(
   uri: string,

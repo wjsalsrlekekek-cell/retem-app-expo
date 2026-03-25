@@ -135,7 +135,7 @@ export default function ProductDetailScreen() {
         userId: product.sellerId,
         type: 'like',
         title: t('notifications.like_title') || 'New Like',
-        body: `${user.name} ${t('notifications.liked_your') || 'liked your'} "${product.title}"`,
+        body: `${user.fullName} ${t('notifications.liked_your') || 'liked your'} "${product.title}"`,
         relatedId: productId,
         isRead: false,
         createdAt: new Date().toISOString(),

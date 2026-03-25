@@ -210,6 +210,7 @@ export const zh: Record<string, string> = {
     'reviews.anonymous': '匿名',
     'common.save': '保存',
     'common.cancel': '取消',
+    'common.coming_soon': '即将推出',
     'common.delete': '删除',
     'common.edit': '编辑',
     'common.back': '返回',
@@ -436,4 +437,6 @@ export const zh: Record<string, string> = {
     'error.user_not_found': '未找到该邮箱的账户',
     'error.invalid_email': '无效的邮箱地址',
     'error.reset_failed': '密码重置失败',
+    'error.generic': '出现了问题',
+    'error.enter_review': '请输入评价内容',
 };

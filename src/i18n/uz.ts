@@ -299,6 +299,7 @@ export const uz = {
 
     // Common
     'common.cancel': 'Bekor qilish',
+    'common.coming_soon': 'Tez kunda',
     'common.delete': 'Oʻchirish',
     'common.edit': 'Tahrirlash',
     'common.back': 'Orqaga',
@@ -548,4 +549,6 @@ export const uz = {
     'error.user_not_found': 'Bu email bilan hisob topilmadi',
     'error.invalid_email': 'Email manzili notoʻgʻri',
     'error.reset_failed': 'Parolni tiklash muvaffaqiyatsiz',
+    'error.generic': 'Xatolik yuz berdi',
+    'error.enter_review': 'Iltimos, sharh yozing',
 };

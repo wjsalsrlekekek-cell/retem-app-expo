@@ -141,16 +141,30 @@ export default function ChatRoomScreen() {
 
     if (untranslated.length === 0) return;
 
-    untranslated.forEach(async (msg) => {
-      setTranslatingIds((prev) => new Set(prev).add(msg.id));
-      const translated = await translateChatMessage(msg.content, otherUser.language || 'auto', language);
-      setTranslatedMessages((prev) => ({ ...prev, [msg.id]: translated }));
+    const translateAll = async () => {
       setTranslatingIds((prev) => {
         const next = new Set(prev);
-        next.delete(msg.id);
+        untranslated.forEach((msg) => next.add(msg.id));
         return next;
       });
-    });
+      await Promise.all(
+        untranslated.map(async (msg) => {
+          try {
+            const translated = await translateChatMessage(msg.content, otherUser.language || 'auto', language);
+            setTranslatedMessages((prev) => ({ ...prev, [msg.id]: translated }));
+          } catch (e) {
+            console.error('Translation failed for message:', msg.id, e);
+          } finally {
+            setTranslatingIds((prev) => {
+              const next = new Set(prev);
+              next.delete(msg.id);
+              return next;
+            });
+          }
+        }),
+      );
+    };
+    translateAll();
   }, [messages, autoTranslate, otherUser, user, language, translatedMessages, translatingIds]);
 
   const toggleAutoTranslate = useCallback(async () => {
@@ -227,15 +241,20 @@ export default function ChatRoomScreen() {
       if (!user || !chat) return;
 
       // Update the message content to mark offer as accepted
-      const offerContent: OfferContent = JSON.parse(msg.content);
-      offerContent.status = 'accepted';
+      try {
+        const offerContent: OfferContent = JSON.parse(msg.content);
+        offerContent.status = 'accepted';
 
-      // Update in Firestore
-      await db.updateMessage(chatId, msg.id, {
-        content: JSON.stringify(offerContent),
-      });
+        // Update in Firestore
+        await db.updateMessage(chatId, msg.id, {
+          content: JSON.stringify(offerContent),
+        });
 
-      showToast(t('chat.offer_accepted') || 'Offer accepted!');
+        showToast(t('chat.offer_accepted') || 'Offer accepted!');
+      } catch (e) {
+        console.error('Failed to parse offer content:', e);
+        showToast(t('error.generic') || 'Something went wrong', 'error');
+      }
     },
     [user, chat, chatId, showToast, t],
   );
@@ -244,15 +263,20 @@ export default function ChatRoomScreen() {
     async (msg: Message) => {
       if (!user || !chat) return;
 
-      const offerContent: OfferContent = JSON.parse(msg.content);
-      offerContent.status = 'rejected';
+      try {
+        const offerContent: OfferContent = JSON.parse(msg.content);
+        offerContent.status = 'rejected';
 
-      // Update in Firestore
-      await db.updateMessage(chatId, msg.id, {
-        content: JSON.stringify(offerContent),
-      });
+        // Update in Firestore
+        await db.updateMessage(chatId, msg.id, {
+          content: JSON.stringify(offerContent),
+        });
 
-      showToast(t('chat.offer_rejected') || 'Offer rejected');
+        showToast(t('chat.offer_rejected') || 'Offer rejected');
+      } catch (e) {
+        console.error('Failed to parse offer content:', e);
+        showToast(t('error.generic') || 'Something went wrong', 'error');
+      }
     },
     [user, chat, chatId, showToast, t],
   );
@@ -291,6 +315,10 @@ export default function ChatRoomScreen() {
 
   const handleSubmitReview = useCallback(async () => {
     if (!user || !product || !otherUser) return;
+    if (!reviewComment.trim()) {
+      showToast(t('error.enter_review') || 'Please enter a review', 'error');
+      return;
+    }
     setSubmittingReview(true);
 
     const review = {

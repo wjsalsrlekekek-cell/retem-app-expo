@@ -188,24 +188,19 @@ export default function LoginScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        {/* Google Login */}
+        {/* Google Login - Coming Soon */}
         <TouchableOpacity
-          style={[styles.secondaryButton, googleLoading && styles.buttonDisabled]}
-          onPress={handleGoogleLogin}
-          disabled={googleLoading}
+          style={[styles.secondaryButton, styles.buttonDisabled]}
+          disabled={true}
           activeOpacity={0.8}
         >
-          {googleLoading ? (
-            <ActivityIndicator color="#334155" size="small" />
-          ) : (
-            <>
-              <Image
-                source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
-                style={styles.googleIcon}
-              />
-              <Text style={styles.secondaryButtonText}>{t('auth.signup.google')}</Text>
-            </>
-          )}
+          <Image
+            source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+            style={styles.googleIcon}
+          />
+          <Text style={styles.secondaryButtonText}>
+            {t('auth.signup.google')} ({t('common.coming_soon') || 'Coming Soon'})
+          </Text>
         </TouchableOpacity>
 
         {/* Sign Up Link */}

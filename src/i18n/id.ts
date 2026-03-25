@@ -210,6 +210,7 @@ export const id: Record<string, string> = {
     'reviews.anonymous': 'Anonim',
     'common.save': 'Simpan',
     'common.cancel': 'Batal',
+    'common.coming_soon': 'Segera hadir',
     'common.delete': 'Hapus',
     'common.edit': 'Edit',
     'common.back': 'Kembali',
@@ -436,4 +437,6 @@ export const id: Record<string, string> = {
     'error.user_not_found': 'Tidak ditemukan akun dengan email ini',
     'error.invalid_email': 'Alamat email tidak valid',
     'error.reset_failed': 'Gagal mereset kata sandi',
+    'error.generic': 'Terjadi kesalahan',
+    'error.enter_review': 'Silakan masukkan ulasan',
 };

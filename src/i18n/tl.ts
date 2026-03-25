@@ -210,6 +210,7 @@ export const tl: Record<string, string> = {
     'reviews.anonymous': 'Hindi kilala',
     'common.save': 'I-save',
     'common.cancel': 'Kanselahin',
+    'common.coming_soon': 'Malapit na',
     'common.delete': 'Tanggalin',
     'common.edit': 'I-edit',
     'common.back': 'Bumalik',
@@ -436,4 +437,6 @@ export const tl: Record<string, string> = {
     'error.user_not_found': 'Walang account na nahanap sa email na ito',
     'error.invalid_email': 'Hindi valid ang email address',
     'error.reset_failed': 'Nabigong i-reset ang password',
+    'error.generic': 'May nangyaring mali',
+    'error.enter_review': 'Mangyaring maglagay ng review',
 };

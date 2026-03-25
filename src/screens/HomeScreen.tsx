@@ -146,19 +146,24 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   const loadProducts = useCallback(async () => {
-    const data = await db.fetchProducts();
-    setProducts(data);
+    try {
+      const data = await db.fetchProducts();
+      setProducts(data);
 
-    const sellerIds = new Set(data.map((p) => p.sellerId));
-    const sellers: Record<string, User> = {};
-    await Promise.all(
-      Array.from(sellerIds).map(async (sid) => {
-        const u = await db.fetchUser(sid);
-        if (u) sellers[sid] = u;
-      }),
-    );
-    setSellersMap(sellers);
-    setLoading(false);
+      const sellerIds = new Set(data.map((p) => p.sellerId));
+      const sellers: Record<string, User> = {};
+      await Promise.all(
+        Array.from(sellerIds).map(async (sid) => {
+          const u = await db.fetchUser(sid);
+          if (u) sellers[sid] = u;
+        }),
+      );
+      setSellersMap(sellers);
+    } catch (error) {
+      console.error('Failed to load products:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -168,15 +173,8 @@ export default function HomeScreen() {
   // Real-time unread notification count via Firestore onSnapshot
   useEffect(() => {
     if (!user) return;
-    const { query: fsQuery, collection: fsCollection, where: fsWhere, onSnapshot: fsOnSnapshot } = require('firebase/firestore');
-    const { db: fireDb } = require('../lib/firebase');
-    const q = fsQuery(
-      fsCollection(fireDb, 'notifications'),
-      fsWhere('userId', '==', user.id),
-      fsWhere('isRead', '==', false)
-    );
-    const unsubscribe = fsOnSnapshot(q, (snap: any) => {
-      setUnreadCount(snap.size);
+    const unsubscribe = db.subscribeToUnreadNotifications(user.id, (count) => {
+      setUnreadCount(count);
     });
     return () => unsubscribe();
   }, [user]);

@@ -9,6 +9,7 @@ import {
   query,
   where,
   orderBy,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User, Product, Notification, Post, Comment, Review } from '../types';
@@ -121,12 +122,17 @@ export async function getUserFavorites(userId: string): Promise<string[]> {
 }
 
 export async function toggleFavorite(userId: string, productId: string): Promise<boolean> {
-  if (await isFavorite(userId, productId)) {
-    await removeFavorite(userId, productId);
-    return false;
-  } else {
-    await addFavorite(userId, productId);
-    return true;
+  try {
+    if (await isFavorite(userId, productId)) {
+      await removeFavorite(userId, productId);
+      return false;
+    } else {
+      await addFavorite(userId, productId);
+      return true;
+    }
+  } catch (error) {
+    console.error('toggleFavorite error:', error);
+    throw error;
   }
 }
 
@@ -208,24 +214,30 @@ export async function isPostLiked(userId: string, postId: string): Promise<boole
 export async function togglePostLike(userId: string, postId: string): Promise<void> {
   const liked = await isPostLiked(userId, postId);
   const postRef = doc(db, 'posts', postId);
-  const postSnap = await getDoc(postRef);
+  const likeRef = doc(db, 'postLikes', likeDocId(userId, postId));
 
   if (liked) {
-    await deleteDoc(doc(db, 'postLikes', likeDocId(userId, postId)));
-    if (postSnap.exists()) {
-      const currentLikes = (postSnap.data() as Post).likes ?? 0;
-      await updateDoc(postRef, { likes: Math.max(0, currentLikes - 1) });
-    }
+    await deleteDoc(likeRef);
+    await runTransaction(db, async (transaction) => {
+      const postSnap = await transaction.get(postRef);
+      if (postSnap.exists()) {
+        const currentLikes = (postSnap.data() as Post).likes ?? 0;
+        transaction.update(postRef, { likes: Math.max(0, currentLikes - 1) });
+      }
+    });
   } else {
-    await setDoc(doc(db, 'postLikes', likeDocId(userId, postId)), {
+    await setDoc(likeRef, {
       userId,
       postId,
       createdAt: new Date().toISOString(),
     });
-    if (postSnap.exists()) {
-      const currentLikes = (postSnap.data() as Post).likes ?? 0;
-      await updateDoc(postRef, { likes: currentLikes + 1 });
-    }
+    await runTransaction(db, async (transaction) => {
+      const postSnap = await transaction.get(postRef);
+      if (postSnap.exists()) {
+        const currentLikes = (postSnap.data() as Post).likes ?? 0;
+        transaction.update(postRef, { likes: currentLikes + 1 });
+      }
+    });
   }
 }
 

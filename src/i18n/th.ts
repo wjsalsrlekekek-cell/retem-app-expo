@@ -210,6 +210,7 @@ export const th: Record<string, string> = {
     'reviews.anonymous': 'ไม่ระบุชื่อ',
     'common.save': 'บันทึก',
     'common.cancel': 'ยกเลิก',
+    'common.coming_soon': 'เร็วๆ นี้',
     'common.delete': 'ลบ',
     'common.edit': 'แก้ไข',
     'common.back': 'กลับ',
@@ -436,4 +437,6 @@ export const th: Record<string, string> = {
     'error.user_not_found': 'ไม่พบบัญชีที่ใช้อีเมลนี้',
     'error.invalid_email': 'ที่อยู่อีเมลไม่ถูกต้อง',
     'error.reset_failed': 'รีเซ็ตรหัสผ่านไม่สำเร็จ',
+    'error.generic': 'เกิดข้อผิดพลาด',
+    'error.enter_review': 'กรุณากรอกรีวิว',
 };

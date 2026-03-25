@@ -210,6 +210,7 @@ export const ja: Record<string, string> = {
     'reviews.anonymous': '匿名',
     'common.save': '保存',
     'common.cancel': 'キャンセル',
+    'common.coming_soon': '準備中',
     'common.delete': '削除',
     'common.edit': '編集',
     'common.back': '戻る',
@@ -436,4 +437,6 @@ export const ja: Record<string, string> = {
     'error.user_not_found': 'このメールアドレスのアカウントが見つかりません',
     'error.invalid_email': '無効なメールアドレスです',
     'error.reset_failed': 'パスワードのリセットに失敗しました',
+    'error.generic': 'エラーが発生しました',
+    'error.enter_review': 'レビューを入力してください',
 };
